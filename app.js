@@ -218,7 +218,7 @@ function togglePasuk() {
   const isOpen = txt.style.maxHeight && txt.style.maxHeight !== '0px';
   txt.style.maxHeight = isOpen ? '0' : '1200px';
   txt.style.opacity = isOpen ? '0' : '1';
-  btn.textContent = isOpen ? '✦ פסוק לדרך' : '✦ סגור';
+  btn.textContent = isOpen ? '✦ יוצאים לדרך' : '✦ סגור';
 }
 
 // ===== SHARING =====
