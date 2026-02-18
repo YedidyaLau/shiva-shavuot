@@ -2,6 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>שבעה שבועות</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -761,10 +762,13 @@ function showIntro() {
   // Countdown
   const omerDay = getTodayOmerDay();
   const ct = document.getElementById('countdown-text');
-  if (omerDay < 1) {
-    const daysLeft = Math.ceil((new Date(OMER_START) - new Date()) / 86400000);
+if (omerDay < 1) {
+  const daysLeft = Math.ceil((new Date(OMER_START) - new Date()) / 86400000);
+  if (daysLeft <= 1) {
+    ct.innerHTML = `הספירה מתחילה <span>הלילה</span> ✨`;
+  } else {
     ct.innerHTML = `הספירה מתחילה בעוד <span>${daysLeft}</span> ימים`;
-  } else if (omerDay <= 49) {
+  }  } else if (omerDay <= 49) {
     const week = Math.ceil(omerDay / 7);
     const dayInWeek = omerDay - (week-1)*7;
     ct.innerHTML = `היום: שבוע ${week}, יום ${dayInWeek} לעומר (יום ${omerDay} מתוך 49)`;
