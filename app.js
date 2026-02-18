@@ -8,6 +8,7 @@
 // היום הראשון של ספירת העומר (ליל הסדר – מהשקיעה)
 // פורמט: 'YYYY-MM-DDThh:mm:ss' – השעה קובעת מאיזה רגע השבוע נפתח
 const OMER_START = new Date('2026-04-02T20:00:00');
+const OMER_END = new Date('2026-05-22T00:00:00'); // שבועות תשפ"ו – אחרי זה הכל פתוח
 
 // ===== STATE =====
 let currentWeek = null;
@@ -21,6 +22,8 @@ function getTodayOmerDay() {
 }
 
 function getUnlockedWeeks() {
+  const now = new Date();
+  if (now >= OMER_END) return [1,2,3,4,5,6,7]; // הספירה הסתיימה – הכל פתוח
   const omerDay = getTodayOmerDay();
   if (omerDay < 1) return [];
   return Array.from({ length: Math.min(Math.ceil(omerDay / 7), 7) }, (_, i) => i + 1);
