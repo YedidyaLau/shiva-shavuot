@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>שבעה שבועות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --warm-white: #FAF7F2;
+    --ink: #1C1A17;
+    --ink-light: #4A4540;
+    --ink-faint: #9A9088;
+    --gold: #C8973A;
+    --gold-light: #E8C97A;
+    --rust: #A0522D;
+    --sage: #7A8C6E;
+    --week-colors: #7A8C6E, #5B7FA6, #C47A6E, #8B6BA8, #A67C52, #6B9E8B, #C8973A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: var(--warm-white);
+    color: var(--ink);
+    min-height: 100vh;
+    direction: rtl;
+  }
+
+  /* ===== HEADER ===== */
+  .site-header {
+    background: var(--ink);
+    padding: 20px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .site-logo {
+    font-family: 'Heebo', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: var(--gold);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+  }
+
+  .header-nav {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .week-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: white;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .week-dot:hover { transform: scale(1.15); }
+  .week-dot.locked { opacity: 0.3; cursor: default; }
+  .week-dot.locked:hover { transform: none; }
+  .week-dot.active { border-color: white; box-shadow: 0 0 0 1px white; }
+
+  .week-dot[data-week="1"] { background: #7A8C6E; }
+  .week-dot[data-week="2"] { background: #5B7FA6; }
+  .week-dot[data-week="3"] { background: #C47A6E; }
+  .week-dot[data-week="4"] { background: #8B6BA8; }
+  .week-dot[data-week="5"] { background: #A67C52; }
+  .week-dot[data-week="6"] { background: #6B9E8B; }
+  .week-dot[data-week="7"] { background: #C8973A; }
+
+  /* ===== HERO / INTRO ===== */
+  #intro-page {
+    min-height: calc(100vh - 68px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 24px;
+    background: var(--ink);
+    color: var(--cream);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #intro-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 70%, rgba(200,151,58,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 20%, rgba(122,140,110,0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .intro-subtitle {
+    font-family: 'Heebo', sans-serif;
+    font-weight: 300;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .intro-title {
+    font-family: 'Heebo', sans-serif;
+    font-weight: 900;
+    font-size: clamp(3.5rem, 12vw, 8rem);
+    line-height: 1;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+
+  .intro-body {
+    max-width: 560px;
+    font-weight: 300;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: rgba(245,240,232,0.8);
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+    margin-bottom: 48px;
+  }
+
+  .weeks-preview {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+    margin-bottom: 48px;
+  }
+
+  .week-pill {
+    padding: 8px 18px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: white;
+    opacity: 0.85;
+  }
+
+  .week-pill[data-week="1"] { background: #7A8C6E; }
+  .week-pill[data-week="2"] { background: #5B7FA6; }
+  .week-pill[data-week="3"] { background: #C47A6E; }
+  .week-pill[data-week="4"] { background: #8B6BA8; }
+  .week-pill[data-week="5"] { background: #A67C52; }
+  .week-pill[data-week="6"] { background: #6B9E8B; }
+  .week-pill[data-week="7"] { background: #C8973A; }
+
+  .intro-countdown {
+    font-family: 'Heebo', sans-serif;
+    font-size: 1rem;
+    color: var(--gold-light);
+    opacity: 0;
+    animation: fadeUp 0.8s 1s forwards;
+  }
+
+  .intro-countdown span {
+    font-weight: 700;
+    font-size: 1.4rem;
+  }
+
+  /* ===== WEEK PAGE ===== */
+  #week-page { display: none; }
+
+  .week-hero {
+    padding: 60px 32px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .week-hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to left, transparent, var(--ink-faint), transparent);
+  }
+
+  .week-number-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .week-title-main {
+    font-family: 'Heebo', sans-serif;
+    font-weight: 900;
+    font-size: clamp(3rem, 10vw, 6rem);
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  .week-tagline {
+    font-size: 1rem;
+    font-weight: 300;
+    color: var(--ink-light);
+    max-width: 480px;
+    line-height: 1.7;
+  }
+
+  .week-accent-bar {
+    height: 4px;
+    width: 60px;
+    border-radius: 2px;
+    margin: 24px 0;
+  }
+
+  /* ===== CONTENT GRID ===== */
+  .content-area {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 32px 100px;
+  }
+
+  .content-section-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 28px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--cream);
+  }
+
+  /* Masonry-style grid */
+  .content-cards {
+    columns: 2;
+    column-gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  .content-card {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 16px rgba(28,26,23,0.07);
+    transition: transform 0.22s, box-shadow 0.22s;
+    animation: fadeUp 0.5s both;
+    break-inside: avoid;
+    margin-bottom: 24px;
+    display: inline-block; /* needed for columns */
+    width: 100%;
+  }
+
+  /* Alternating alignment for visual interest */
+  .content-card:nth-child(odd) { margin-top: 0; }
+  .content-card:nth-child(4n+1) { transform: rotate(-0.4deg); }
+  .content-card:nth-child(4n+3) { transform: rotate(0.3deg); }
+
+  .content-card:hover {
+    transform: translateY(-3px) rotate(0deg) !important;
+    box-shadow: 0 10px 32px rgba(28,26,23,0.13);
+  }
+
+  .content-card.locked-card {
+    opacity: 0.45;
+    cursor: default;
+    filter: grayscale(0.4);
+  }
+
+  .content-card.locked-card:hover {
+    transform: none !important;
+    box-shadow: 0 2px 16px rgba(28,26,23,0.07);
+  }
+
+  /* Opening card – spans full width */
+  .content-card.card-featured {
+    column-span: all;
+    transform: none !important;
+    background: var(--ink);
+    color: var(--cream);
+    margin-bottom: 32px;
+  }
+
+  .content-card.card-featured:hover {
+    transform: translateY(-2px) !important;
+  }
+
+  .card-featured .card-type-badge {
+    background: rgba(255,255,255,0.12);
+    color: rgba(245,240,232,0.8);
+    border-right-color: var(--gold) !important;
+  }
+
+  .card-featured .card-title { color: var(--cream); font-size: 1.6rem; }
+  .card-featured .card-excerpt { color: rgba(245,240,232,0.75); }
+  .card-featured .card-meta { border-top-color: rgba(255,255,255,0.1); }
+  .card-featured .card-day { color: rgba(245,240,232,0.4); }
+  .card-featured .card-share-btn { color: rgba(245,240,232,0.5); }
+  .card-featured .card-share-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+  .card-featured .card-question {
+    background: rgba(255,255,255,0.08);
+    border-right-color: var(--gold);
+    color: var(--cream);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 22px 22px 0;
+  }
+
+  .card-type-badge {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    background: var(--cream);
+    color: var(--ink-light);
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 3px;
+    border-right: 2px solid transparent;
+  }
+
+  .card-title {
+    font-family: 'Heebo', sans-serif;
+    font-weight: 800;
+    font-size: 1.15rem;
+    line-height: 1.35;
+    flex: 1;
+  }
+
+  .card-body {
+    padding: 14px 22px 20px;
+  }
+
+  /* Read more collapse */
+  .card-excerpt-wrap {
+    position: relative;
+    margin-bottom: 14px;
+  }
+
+  .card-excerpt {
+    font-size: 0.93rem;
+    line-height: 1.75;
+    color: var(--ink-light);
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+
+  .card-excerpt.collapsed {
+    max-height: 4.4em; /* ~2.5 lines */
+    -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+  }
+
+  .card-excerpt.expanded { max-height: 1000px; mask-image: none; -webkit-mask-image: none; }
+
+  .read-more-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Heebo', sans-serif;
+    margin-bottom: 14px;
+    display: block;
+    transition: opacity 0.15s;
+  }
+
+  .read-more-btn:hover { opacity: 0.7; }
+
+  .card-question {
+    background: var(--cream);
+    border-radius: 8px;
+    padding: 13px 15px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--ink);
+    border-right: 3px solid var(--gold);
+    margin-bottom: 14px;
+  }
+
+  .card-question::before {
+    content: 'לשיחה: ';
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--cream);
+  }
+
+  .card-day {
+    font-size: 0.72rem;
+    color: var(--ink-faint);
+  }
+
+  .card-share-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+    font-family: 'Heebo', sans-serif;
+  }
+
+  .card-share-btn:hover { background: var(--cream); color: var(--ink); }
+
+  .locked-overlay {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 24px;
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+  }
+
+  /* ===== VIDEO EMBED ===== */
+  .video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    background: var(--ink);
+  }
+
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: none;
+  }
+
+  /* ===== WEEK SELECTOR (bottom nav) ===== */
+  .weeks-nav {
+    background: white;
+    border-top: 1px solid var(--cream);
+    padding: 20px 24px;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 50;
+    display: none;
+  }
+
+  .weeks-nav-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .weeks-nav-inner::-webkit-scrollbar { display: none; }
+
+  .week-tab {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 2px solid transparent;
+    background: var(--cream);
+    color: var(--ink-light);
+    transition: all 0.2s;
+    font-family: 'Heebo', sans-serif;
+  }
+
+  .week-tab.active-tab {
+    color: white;
+    border-color: transparent;
+  }
+
+  .week-tab.locked-tab { opacity: 0.4; cursor: default; }
+
+  .week-tab[data-week="1"].active-tab { background: #7A8C6E; }
+  .week-tab[data-week="2"].active-tab { background: #5B7FA6; }
+  .week-tab[data-week="3"].active-tab { background: #C47A6E; }
+  .week-tab[data-week="4"].active-tab { background: #8B6BA8; }
+  .week-tab[data-week="5"].active-tab { background: #A67C52; }
+  .week-tab[data-week="6"].active-tab { background: #6B9E8B; }
+  .week-tab[data-week="7"].active-tab { background: #C8973A; }
+
+  /* ===== UTILS ===== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 700px) {
+    .site-header { padding: 16px 20px; }
+    .week-hero { padding: 40px 20px 32px; }
+    .content-area { padding: 32px 16px 100px; }
+    .content-cards { columns: 1; }
+    .content-card:nth-child(4n+1),
+    .content-card:nth-child(4n+3) { transform: none; }
+    .card-top { flex-direction: column; gap: 8px; }
+  }
+
+  /* ===== SHARE TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    z-index: 200;
+    white-space: nowrap;
+  }
+
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="#" class="site-logo" onclick="showIntro()">שבעה שבועות</a>
+  <nav class="header-nav" id="header-dots"></nav>
+</header>
+
+<!-- INTRO PAGE -->
+<main id="intro-page">
+  <p class="intro-subtitle">ספירת העומר תשפ״ו</p>
+  <h1 class="intro-title">שבעה<br>שבועות</h1>
+  <p class="intro-body" id="intro-body-text">
+    מפסח ועד שבועות – שבעה שבועות של ספירה. בכל שבוע נצא לבדוק יחד זירה אחת מהחיים, ונשאל שאלות שאולי לא שאלנו. 
+    הכניסה פתוחה לכולם. אין צורך לדעת לספור.
+  </p>
+  <div id="pasuk-section" style="opacity:0;animation:fadeUp 0.8s 0.7s forwards;margin-bottom:32px;">
+    <button onclick="togglePasuk()" id="pasuk-btn" style="background:none;border:1px solid rgba(200,151,58,0.4);color:var(--gold);padding:8px 18px;border-radius:100px;font-family:Heebo,sans-serif;font-size:0.8rem;cursor:pointer;letter-spacing:0.08em;transition:all 0.2s;">
+      ✦ פסוק לדרך
+    </button>
+    <div id="pasuk-text" style="max-height:0;overflow:hidden;transition:max-height 0.5s ease,opacity 0.4s;opacity:0;">
+      <div style="max-width:600px;margin:0 auto;text-align:right;">
+        <!-- פסוק -->
+        <p style="font-family:Heebo,sans-serif;font-size:1.1rem;line-height:2.1;color:rgba(245,240,232,0.9);margin-top:24px;font-weight:400;letter-spacing:0.04em;border-right:3px solid var(--gold);padding-right:16px;">
+          וְהָיָה אֱמוּנַת עִתֶּיךָ חֹסֶן יְשׁוּעֹת<br>
+          חׇכְמַת וָדָעַת יִרְאַת ה׳ הִיא אוֹצָרוֹ
+        </p>
+        <p style="font-size:0.72rem;color:rgba(245,240,232,0.3);margin-top:6px;margin-bottom:28px;font-family:Heebo,sans-serif;padding-right:19px;">ישעיהו לג, ו</p>
+
+        <!-- כותרת -->
+        <p style="font-family:Heebo,sans-serif;font-size:0.65rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;font-weight:600;">על הפרויקט</p>
+
+        <!-- גוף -->
+        <div style="font-family:Heebo,sans-serif;font-size:0.97rem;line-height:1.85;color:rgba(245,240,232,0.75);font-weight:300;">
+          <p style="margin-bottom:16px;">פסוק סתום לכאורה בספר ישעיהו מספר איך בתקופה משברית האדם יכול למצוא עוגן ומשמעות בלימוד ובאמונה. ישעיהו קובע מוטו: "לִמְדוּ הֵיטֵב" – והכוונה אינה להצטיין בלימודים, אלא ללמוד להיות טובים, ללמוד להיטיב.</p>
+          <p style="margin-bottom:16px;">בגמרא, חכמים לומדים את הפסוק הזה כמפתח לדרך החיים הראויה. כל מילה בפסוק, מלמד אותנו ריש לקיש, רומזת לאחד מסדרי המשנה – זרעים, מועד, נשים, נזיקין, קודשים וטהרות. רבא מעמיק ומלמד: כשבוחנים את מעשי האדם לאורך חייו, שואלים אותו שש שאלות – נשאת ונתת באמונה? קבעת עיתים לתורה? עסקת בפריה ורביה? צפית לישועה? פלפלת בחכמה? הבנת דבר מתוך דבר?</p>
+          <p style="margin-bottom:16px;">האדם נבחן בהתנהלות הארצית שלו – בחברה חקלאית, במצוות התלויות בארץ, ובחברה עירונית, במסחר; ביחסו לזמן; במשפחה; בתיקון החברתי שהוא רואה כמפתח לגאולה; בטהרת הגוף הקשורה לחכמה; ובמגע שלו עם הקודש, עם הנשגב.</p>
+          <p style="margin-bottom:24px;">ששה סדרי משנה מציעים ששה ממדים דרכם אפשר להסתכל על החיים ולשאול, משבוע לשבוע: איפה אני? ואיפה אני רוצה להיות?<br>ובסוף – הכל לשם שמים.</p>
+          <p style="color:rgba(245,240,232,0.5);font-size:0.88rem;border-top:1px solid rgba(255,255,255,0.08);padding-top:16px;margin-bottom:24px;">בהצלחה לנו!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="weeks-preview" id="weeks-preview-pills"></div>
+  <p class="intro-countdown" id="countdown-text"></p>
+</main>
+
+<!-- WEEK PAGE -->
+<section id="week-page">
+  <div class="week-hero" id="week-hero">
+    <p class="week-number-label" id="week-number-label"></p>
+    <h1 class="week-title-main" id="week-title-main"></h1>
+    <div class="week-accent-bar" id="week-accent-bar"></div>
+    <p class="week-tagline" id="week-tagline"></p>
+  </div>
+  <div class="content-area">
+    <p class="content-section-label">תכנים שבוע זה</p>
+    <div class="content-cards" id="content-cards"></div>
+  </div>
+</section>
+
+<!-- BOTTOM WEEK NAV -->
+<nav class="weeks-nav" id="weeks-nav">
+  <div class="weeks-nav-inner" id="weeks-nav-inner"></div>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast">הקישור הועתק ✓</div>
+
+<script>
+// ===== CONFIGURATION =====
+// עדכן כאן את תאריך תחילת ספירת העומר (ליל הסדר, יום שאחרי שקיעת החמה)
+// פורמט: YYYY-MM-DD (זהו היום הראשון של הספירה)
+const OMER_START = new Date('2026-04-01'); // פסח תשפ"ו // פסח תשפ"ה
+
+const WEEKS = [
+  { num: 1, title: 'קשר לארץ',       color: '#7A8C6E', tagline: 'על האדמה שתחת הרגליים, על מקום ועל שורשים' },
+  { num: 2, title: 'הזמן',            color: '#5B7FA6', tagline: 'על חיים בזמן, על עבר ועתיד, על הרגע שנמצאים בו' },
+  { num: 3, title: 'משפחה',           color: '#C47A6E', tagline: 'על הקרובים, על הסיפורים, על מה שעובר מדור לדור' },
+  { num: 4, title: 'חברה וציבור',    color: '#8B6BA8', tagline: 'על הכלל, על אחריות, על מה שאנחנו חייבים לאחרים' },
+  { num: 5, title: 'הגוף',            color: '#A67C52', tagline: 'על הגוף שאנחנו חיים בו ועם מה שהוא אומר לנו' },
+  { num: 6, title: 'קודש',            color: '#6B9E8B', tagline: 'על מה שאנחנו מקדשים, על פגישות עם גדול מאתנו' },
+  { num: 7, title: 'השמים שבתוכי',   color: '#C8973A', tagline: 'על הפנים, על נפש, על מה שלא ניתן למגע' },
+];
+
+// ===== CONTENT DATA =====
+// כאן תוסיף/תערוך תכנים. כל פריט הוא אובייקט בתוך המערך של השבוע.
+// שדות:
+//   id: מזהה ייחודי (לשיתוף)
+//   day: מ-1 עד 7, באיזה יום בשבוע הפריט נפתח (1=יום ראשון של השבוע)
+//   type: 'פתיחה' | 'טקסט' | 'שאלה' | 'וידאו' | 'מקור'
+//   title: כותרת
+//   excerpt: טקסט קצר / תקציר
+//   question: שאלה לשיחה (אופציונלי)
+//   videoId: מזהה יוטיוב (אופציונלי, אם type='וידאו')
+const CONTENT = {
+  1: [
+    { id: 'w1-1', day: 1, type: 'פתיחה', title: 'כותרת פריט פתיחה לשבוע הראשון', excerpt: 'כאן יבוא הטקסט של פריט הפתיחה. אפשר להוסיף כמה פסקאות. זהו מקום טוב להציג את נושא השבוע בצורה אישית ומזמינה.', question: 'מה הקשר שלך לאדמה שגדלת עליה?' },
+    { id: 'w1-2', day: 1, type: 'טקסט', title: 'פריט תוכן שני', excerpt: 'תוכן לדוגמה. כאן יבוא קטע קריאה, ציטוט, או כל תוכן שתבחר לשבוע זה.' },
+    { id: 'w1-3', day: 2, type: 'שאלה', title: 'פריט שלישי – יום שני', excerpt: 'תוכן שנפתח ביום השני של השבוע.' , question: 'שאלה לדוגמה?' },
+    { id: 'w1-4', day: 4, type: 'וידאו', title: 'פריט וידאו לדוגמה', excerpt: 'תיאור קצר של הוידאו.', videoId: 'dQw4w9WgXcQ' },
+    { id: 'w1-5', day: 5, type: 'טקסט', title: 'פריט חמישי', excerpt: 'תוכן שנפתח ביום החמישי.', question: 'שאלת סיום לשבוע?' },
+  ],
+  2: [
+    { id: 'w2-1', day: 1, type: 'פתיחה', title: 'פתיחת שבוע הזמן', excerpt: 'תוכן לדוגמה לשבוע השני.', question: 'מה הזמן שקשה לך לפגוש?' },
+  ],
+  3: [
+    { id: 'w3-1', day: 1, type: 'פתיחה', title: 'פתיחת שבוע המשפחה', excerpt: 'תוכן לדוגמה לשבוע השלישי.' },
+  ],
+  4: [
+    { id: 'w4-1', day: 1, type: 'פתיחה', title: 'פתיחת שבוע חברה וציבור', excerpt: 'תוכן לדוגמה לשבוע הרביעי.' },
+  ],
+  5: [
+    { id: 'w5-1', day: 1, type: 'פתיחה', title: 'פתיחת שבוע הגוף', excerpt: 'תוכן לדוגמה לשבוע החמישי.' },
+  ],
+  6: [
+    { id: 'w6-1', day: 1, type: 'פתיחה', title: 'פתיחת שבוע הקודש', excerpt: 'תוכן לדוגמה לשבוע השישי.' },
+  ],
+  7: [
+    { id: 'w7-1', day: 1, type: 'פתיחה', title: 'פתיחת שבוע השמים שבתוכי', excerpt: 'תוכן לדוגמה לשבוע השביעי.' },
+  ],
+};
+
+// ===== STATE =====
+let currentWeek = null;
+
+function getTodayOmerDay() {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const start = new Date(OMER_START);
+  start.setHours(0,0,0,0);
+  const diff = Math.floor((today - start) / 86400000);
+  return diff + 1; // day 1 = first day of omer
+}
+
+function getUnlockedWeeks() {
+  const omerDay = getTodayOmerDay();
+  if (omerDay < 1) return [];
+  const weeksOpen = Math.min(Math.ceil(omerDay / 7), 7);
+  return Array.from({length: weeksOpen}, (_, i) => i + 1);
+}
+
+function getWeekOmerDay(weekNum) {
+  // Returns which omer day we're on within this week (1-7), or 8 if week is past
+  const omerDay = getTodayOmerDay();
+  const weekStart = (weekNum - 1) * 7 + 1;
+  return omerDay - weekStart + 1;
+}
+
+// ===== RENDER HEADER DOTS =====
+function renderHeaderDots() {
+  const unlocked = getUnlockedWeeks();
+  const container = document.getElementById('header-dots');
+  container.innerHTML = WEEKS.map(w => {
+    const isOpen = unlocked.includes(w.num);
+    const isActive = currentWeek === w.num;
+    const cls = ['week-dot', !isOpen ? 'locked' : '', isActive ? 'active' : ''].filter(Boolean).join(' ');
+    return `<a class="${cls}" data-week="${w.num}" title="${w.title}" 
+      onclick="${isOpen ? `showWeek(${w.num})` : 'return false'};return false" href="#">
+      ${w.num}
+    </a>`;
+  }).join('');
+}
+
+// ===== RENDER BOTTOM NAV =====
+function renderWeeksNav() {
+  const unlocked = getUnlockedWeeks();
+  const nav = document.getElementById('weeks-nav');
+  const inner = document.getElementById('weeks-nav-inner');
+  inner.innerHTML = WEEKS.map(w => {
+    const isOpen = unlocked.includes(w.num);
+    const isActive = currentWeek === w.num;
+    const cls = ['week-tab', isActive ? 'active-tab' : '', !isOpen ? 'locked-tab' : ''].filter(Boolean).join(' ');
+    return `<button class="${cls}" data-week="${w.num}" 
+      onclick="${isOpen ? `showWeek(${w.num})` : 'return'}" 
+      ${!isOpen ? 'disabled' : ''}>
+      שבוע ${w.num}: ${w.title}
+    </button>`;
+  }).join('');
+  nav.style.display = currentWeek ? 'block' : 'none';
+}
+
+// ===== RENDER INTRO =====
+function showIntro() {
+  currentWeek = null;
+  document.getElementById('intro-page').style.display = 'flex';
+  document.getElementById('week-page').style.display = 'none';
+  renderHeaderDots();
+  renderWeeksNav();
+
+  // Pills
+  const pills = document.getElementById('weeks-preview-pills');
+  const unlocked = getUnlockedWeeks();
+  pills.innerHTML = WEEKS.map(w => {
+    const locked = !unlocked.includes(w.num);
+    return `<span class="week-pill" data-week="${w.num}" style="opacity:${locked?0.35:0.9};cursor:${locked?'default':'pointer'}"
+      onclick="${!locked ? `showWeek(${w.num})` : ''}">
+      ${w.title}${locked ? ' 🔒' : ''}
+    </span>`;
+  }).join('');
+
+  // Countdown
+  const omerDay = getTodayOmerDay();
+  const ct = document.getElementById('countdown-text');
+  if (omerDay < 1) {
+    const daysLeft = Math.ceil((new Date(OMER_START) - new Date()) / 86400000);
+    ct.innerHTML = `הספירה מתחילה בעוד <span>${daysLeft}</span> ימים`;
+  } else if (omerDay <= 49) {
+    const week = Math.ceil(omerDay / 7);
+    const dayInWeek = omerDay - (week-1)*7;
+    ct.innerHTML = `היום: שבוע ${week}, יום ${dayInWeek} לעומר (יום ${omerDay} מתוך 49)`;
+  } else {
+    ct.innerHTML = `ספירת העומר הסתיימה – כל התכנים פתוחים`;
+  }
+
+  // Update URL
+  history.pushState({}, '', window.location.pathname);
+}
+
+// ===== RENDER WEEK =====
+function showWeek(weekNum) {
+  const unlocked = getUnlockedWeeks();
+  if (!unlocked.includes(weekNum)) return;
+
+  currentWeek = weekNum;
+  const week = WEEKS[weekNum - 1];
+  const omerDayInWeek = getWeekOmerDay(weekNum); // how many days of this week have passed
+
+  // Show/hide pages
+  document.getElementById('intro-page').style.display = 'none';
+  document.getElementById('week-page').style.display = 'block';
+
+  // Hero
+  document.getElementById('week-number-label').textContent = `שבוע ${weekNum} מתוך 7`;
+  document.getElementById('week-title-main').textContent = week.title;
+  document.getElementById('week-title-main').style.color = week.color;
+  document.getElementById('week-accent-bar').style.background = week.color;
+  document.getElementById('week-tagline').textContent = week.tagline;
+  document.getElementById('week-hero').style.background = week.color + '08';
+
+  // Cards
+  const cards = (CONTENT[weekNum] || []).sort((a,b) => a.day - b.day);
+  const container = document.getElementById('content-cards');
+  container.innerHTML = cards.map((item, i) => {
+    const isVisible = omerDayInWeek >= item.day || unlocked[unlocked.length-1] > weekNum;
+    return renderCard(item, week.color, isVisible, i);
+  }).join('');
+
+  renderHeaderDots();
+  renderWeeksNav();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+
+  // Update URL for sharing
+  history.pushState({week: weekNum}, '', `#שבוע-${weekNum}`);
+}
+
+function renderCard(item, color, isVisible, index) {
+  if (!isVisible) {
+    return `<div class="content-card locked-card" style="animation-delay:${index*0.06}s">
+      <div class="locked-overlay">🔒 יפתח בהמשך השבוע</div>
+    </div>`;
+  }
+
+  const isFeatured = item.type === 'פתיחה';
+  const cardClass = `content-card${isFeatured ? ' card-featured' : ''}`;
+
+  const videoHtml = item.videoId ? `
+    <div class="video-wrapper">
+      <iframe src="https://www.youtube.com/embed/${item.videoId}" 
+        title="${item.title}" allowfullscreen loading="lazy"></iframe>
+    </div>` : '';
+
+  const questionHtml = item.question ? `
+    <div class="card-question">${item.question}</div>` : '';
+
+  const needsReadMore = !isFeatured && item.excerpt && item.excerpt.length > 120;
+  const excerptHtml = needsReadMore
+    ? `<div class="card-excerpt-wrap">
+        <p class="card-excerpt collapsed" id="exc-${item.id}">${item.excerpt}</p>
+       </div>
+       <button class="read-more-btn" id="rmb-${item.id}" onclick="toggleReadMore('${item.id}')" style="color:${color}">קרא עוד ↓</button>`
+    : `<p class="card-excerpt" style="margin-bottom:14px">${item.excerpt}</p>`;
+
+  return `<div class="${cardClass}" style="animation-delay:${index*0.08}s" id="card-${item.id}">
+    <div class="card-top">
+      <span class="card-type-badge" style="border-right:2px solid ${color}">${item.type}</span>
+      <h2 class="card-title">${item.title}</h2>
+    </div>
+    <div class="card-body">
+      ${videoHtml}
+      ${excerptHtml}
+      ${questionHtml}
+      <div class="card-meta">
+        <span class="card-day">יום ${item.day} בשבוע</span>
+        <button class="card-share-btn" onclick="shareCard('${item.id}')">שתף ↗</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ===== READ MORE =====
+function toggleReadMore(id) {
+  const exc = document.getElementById('exc-' + id);
+  const btn = document.getElementById('rmb-' + id);
+  if (!exc) return;
+  if (exc.classList.contains('collapsed')) {
+    exc.classList.remove('collapsed');
+    exc.classList.add('expanded');
+    btn.textContent = 'סגור ↑';
+  } else {
+    exc.classList.remove('expanded');
+    exc.classList.add('collapsed');
+    btn.textContent = 'קרא עוד ↓';
+  }
+}
+
+// ===== SHARING =====
+function shareCard(cardId) {
+  const url = `${window.location.origin}${window.location.pathname}#${cardId}`;
+  if (navigator.share) {
+    navigator.share({ url });
+  } else {
+    navigator.clipboard.writeText(url).then(() => showToast());
+  }
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== URL ROUTING =====
+function handleHash() {
+  const hash = window.location.hash;
+  if (!hash) { showIntro(); return; }
+  const weekMatch = hash.match(/שבוע-(\d)/);
+  if (weekMatch) {
+    showWeek(parseInt(weekMatch[1]));
+  } else {
+    showIntro();
+  }
+}
+
+// ===== PASUK TOGGLE =====
+function togglePasuk() {
+  const txt = document.getElementById('pasuk-text');
+  const btn = document.getElementById('pasuk-btn');
+  const isOpen = txt.style.maxHeight !== '0px' && txt.style.maxHeight !== '';
+  if (isOpen) {
+    txt.style.maxHeight = '0';
+    txt.style.opacity = '0';
+    btn.textContent = '✦ פסוק לדרך';
+  } else {
+    txt.style.maxHeight = '1200px';
+    txt.style.opacity = '1';
+    btn.textContent = '✦ סגור';
+  }
+}
+
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded', handleHash);
+window.addEventListener('popstate', handleHash);
+</script>
+</body>
+</html>
