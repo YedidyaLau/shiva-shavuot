@@ -7,11 +7,12 @@
 // ----- הגדרת תאריך -----
 // היום הראשון של ספירת העומר (ליל הסדר – מהשקיעה)
 // פורמט: 'YYYY-MM-DDThh:mm:ss' – השעה קובעת מאיזה רגע השבוע נפתח
-const OMER_START = new Date('2026-04-02T20:00:00');
+const OMER_START = new Date('2026-02-05T20:00:00');
 const OMER_END = new Date('2026-05-22T00:00:00'); // שבועות תשפ"ו – אחרי זה הכל פתוח
 
 // ===== STATE =====
 let currentWeek = null;
+let hasVisitedOnce = false;
 
 // ===== OMER DATE LOGIC =====
 function getTodayOmerDay() {
@@ -74,9 +75,38 @@ function renderWeeksNav() {
   nav.style.display = currentWeek ? 'block' : 'none';
 }
 
+function formatOmerCount(omerDay, week, dayInWeek) {
+  const dayNums = ['','יום אחד','שני ימים','שלושה ימים','ארבעה ימים','חמישה ימים','שישה ימים','שבעה ימים'];
+  const weekNums = ['','שבוע אחד','שני שבועות','שלושה שבועות','ארבעה שבועות','חמישה שבועות','ששה שבועות'];
+
+  if (omerDay === 7 || (omerDay > 7 && dayInWeek === 7)) {
+    // יום שבת בשבוע – שבועות שלמים
+    return `היום <span>${omerDay} יום שהם ${weekNums[week]}</span> לעומר`;
+  } else if (omerDay < 7) {
+    // שבוע ראשון
+    return `היום <span>${omerDay} ימים</span> לעומר`;
+  } else {
+    // שבועות + ימים
+    return `היום <span>${omerDay} יום שהם ${weekNums[week-1]} ו${dayNums[dayInWeek]}</span> לעומר`;
+  }
+}
+
+function getTodayCardId() {
+  const omerDay = getTodayOmerDay();
+  if (omerDay < 1 || omerDay > 49) return null;
+  const week = Math.ceil(omerDay / 7);
+  const dayInWeek = omerDay - (week - 1) * 7;
+  // מצא את הפריט שנפתח היום או הכי קרוב אליו
+  const weekItems = getWeekContent(week)
+    .filter(item => item.day <= dayInWeek)
+    .sort((a, b) => b.day - a.day); // הכי עדכני קודם
+  return weekItems.length ? weekItems[0].id : null;
+}
+
 // ===== RENDER: INTRO PAGE =====
 function showIntro() {
   currentWeek = null;
+  localStorage.removeItem('shiva_visited');
   document.getElementById('intro-page').style.display = 'flex';
   document.getElementById('week-page').style.display = 'none';
   renderHeaderDots();
@@ -96,7 +126,7 @@ function showIntro() {
   // ספירה לאחור / מצב שוטף
   const omerDay = getTodayOmerDay();
   const ct = document.getElementById('countdown-text');
-  if (omerDay < 1) {
+if (omerDay < 1) {
     const msLeft = OMER_START - new Date();
     const daysLeft = Math.ceil(msLeft / 86400000);
     if (daysLeft <= 1) {
@@ -107,7 +137,10 @@ function showIntro() {
   } else if (omerDay <= 49) {
     const week = Math.ceil(omerDay / 7);
     const dayInWeek = omerDay - (week - 1) * 7;
-    ct.innerHTML = `היום: שבוע ${week}, יום ${dayInWeek} לעומר (יום ${omerDay} מתוך 49)`;
+    const omerText = formatOmerCount(omerDay, week, dayInWeek);
+    ct.innerHTML = `${omerText} — <a href="#" onclick="showWeek(${week});return false;" 
+      style="color:var(--gold-light);text-decoration:underline;text-underline-offset:3px;">
+      לתכנים של היום ←</a>`;
   } else {
     ct.innerHTML = `ספירת העומר הסתיימה – כל התכנים פתוחים`;
   }
@@ -116,6 +149,16 @@ function showIntro() {
 }
 
 // ===== RENDER: WEEK PAGE =====
+function isItemVisible(item, dayProgress) {
+  if (dayProgress < item.day) return false;
+  if (dayProgress > item.day) return true;
+  // אותו יום – בדוק שעה אם מוגדרת
+  if (item.hour) {
+    return new Date().getHours() >= item.hour;
+  }
+  return true;
+}
+
 function showWeek(weekNum) {
   const unlocked = getUnlockedWeeks();
   if (!unlocked.includes(weekNum)) return;
@@ -139,17 +182,47 @@ function showWeek(weekNum) {
   // כרטיסי תוכן
   const cards = getWeekContent(weekNum);
   document.getElementById('content-cards').innerHTML = cards.map((item, i) => {
-    const isVisible = isPastWeek || dayProgress >= item.day;
+  const isVisible = isPastWeek || isItemVisible(item, dayProgress);
     return renderCard(item, week.color, isVisible, i);
   }).join('');
 
   renderHeaderDots();
   renderWeeksNav();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // גלול לפריט היומי אם זה השבוע הנוכחי
+  const omerDay = getTodayOmerDay();
+  const todayWeek = Math.ceil(omerDay / 7);
+  if (weekNum === todayWeek) {
+    const cardId = getTodayCardId();
+    if (cardId) {
+      setTimeout(() => {
+        const el = document.getElementById('card-' + cardId);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+    }
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   history.pushState({ week: weekNum }, '', `#שבוע-${weekNum}`);
 }
 
 // ===== RENDER: CARD =====
+function getTypeIcon(type) {
+  const icons = {
+    'פתיחה':  '✦',
+    'שבת':    '🕯',
+    'מוצש':   '✶',
+    'לימוד':  '📖',
+    'זווית':  '↗',
+    'העמקה':  '◎',
+    'סיום':   '◇',
+    'טקסט':   '◈',
+    'שאלה':   '?',
+    'וידאו':  '▶',
+    'מקור':   '❝',
+  };
+  return icons[type] || '';
+}
+
 function renderCard(item, color, isVisible, index) {
   if (!isVisible) {
     return `<div class="content-card locked-card" style="animation-delay:${index * 0.06}s">
@@ -188,8 +261,8 @@ function renderCard(item, color, isVisible, index) {
     style="animation-delay:${index * 0.08}s"
     ${tagsAttr} ${relatedAttr}>
     <div class="card-top">
-      <span class="card-type-badge" style="border-right:2px solid ${color}">${item.type}</span>
-      <h2 class="card-title">${item.title}</h2>
+    <span class="card-type-badge" style="border-right:2px solid ${color}">${getTypeIcon(item.type)} ${item.type}</span>
+    <h2 class="card-title">${item.title}</h2>
     </div>
     <div class="card-body">
       ${videoHtml}
@@ -243,14 +316,28 @@ function showToast() {
 // ===== ROUTING =====
 function handleHash() {
   const hash = window.location.hash;
-  if (!hash) { showIntro(); return; }
-  const weekMatch = hash.match(/שבוע-(\d)/);
-  if (weekMatch) {
-    showWeek(parseInt(weekMatch[1]));
+  const omerDay = getTodayOmerDay();
+  const currentWeekNum = Math.ceil(omerDay / 7);
+
+  if (hash) {
+    const weekMatch = hash.match(/שבוע-(\d)/);
+    if (weekMatch) { showWeek(parseInt(weekMatch[1])); return; }
+  }
+
+if (hasVisitedOnce && omerDay >= 1 && omerDay <= 49) {
+  showWeek(currentWeekNum);
   } else {
+    hasVisitedOnce = true;
     showIntro();
   }
 }
 
+function goHome() {
+  console.log('goHome called, hasVisitedOnce:', hasVisitedOnce);
+
+  hasVisitedOnce = false;  currentWeek = null;
+  window.location.hash = '';
+  showIntro();
+}
+
 window.addEventListener('DOMContentLoaded', handleHash);
-window.addEventListener('popstate', handleHash);

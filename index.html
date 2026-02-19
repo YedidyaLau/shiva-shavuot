@@ -259,8 +259,7 @@
 <body>
 
 <header class="site-header">
-  <a href="#" class="site-logo" onclick="showIntro()">שבעה שבועות</a>
-  <nav class="header-nav" id="header-dots"></nav>
+<a href="#" class="site-logo" onclick="goHome();return false;">שבעה שבועות</a>  <nav class="header-nav" id="header-dots"></nav>
 </header>
 
 <!-- דף פתיחה -->
@@ -296,6 +295,7 @@
     </div>
   </div>
 
+
   <div class="weeks-preview" id="weeks-preview-pills"></div>
   <!-- מי אנחנו + ווטסאפ -->
 <div style="opacity:0;animation:fadeUp 0.8s 0.9s forwards;margin-bottom:40px;display:flex;flex-direction:column;align-items:center;gap:20px;">
@@ -322,6 +322,17 @@
 </a>
 
 <p class="intro-countdown" id="countdown-text"></p>
+
+<!-- לוגואים -->
+<div style="opacity:0;animation:fadeUp 0.8s 1.1s forwards;margin-bottom:32px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <p style="font-size:0.65rem;letter-spacing:0.2em;color:rgba(245,240,232,0.3);text-transform:uppercase;">בשיתוף</p>
+  <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:center;">
+  <img src="logo-alon.jpg" alt="ישוב אלון" 
+    style="height:60px;background:white;padding:7px 12px;border-radius:6px;">
+  <img src="logo-kolel.jpg" alt="כולל מחניים" 
+    style="height:60px;background:white;padding:7px 12px;border-radius:6px;">  </div>
+</div>
+
 </main>
 
 <!-- דף שבוע -->
