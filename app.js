@@ -7,7 +7,7 @@
 // ----- הגדרת תאריך -----
 // היום הראשון של ספירת העומר (ליל הסדר – מהשקיעה)
 // פורמט: 'YYYY-MM-DDThh:mm:ss' – השעה קובעת מאיזה רגע השבוע נפתח
-const OMER_START = new Date('2026-04-02T20:00:00');
+const OMER_START = new Date('2026-02-01T20:00:00');
 const OMER_END = new Date('2026-05-22T00:00:00'); // שבועות תשפ"ו – אחרי זה הכל פתוח
 
 // ===== STATE =====
@@ -41,21 +41,84 @@ function getWeekDayProgress(weekNum) {
 function getWeekContent(weekNum) {
   return CONTENT
     .filter(item => item.week === weekNum)
-    .sort((a, b) => a.day - b.day);
+    .sort((a, b) => a.day - b.day || (a.order || 1) - (b.order || 1));
 }
 
 // ===== RENDER: HEADER DOTS =====
 function renderHeaderDots() {
   const unlocked = getUnlockedWeeks();
+  const track = typeof currentBikkurimWeek !== 'undefined' && currentBikkurimWeek
+    ? 'bikkurim'
+    : (currentWeek ? 'mahalakh' : 'intro');
+
   document.getElementById('header-dots').innerHTML = WEEKS.map(w => {
     const isOpen = unlocked.includes(w.num);
-    const isActive = currentWeek === w.num;
+    // בדף הבית – כדורים נעולים תמיד
+    if (track === 'intro') {
+      return `<a class="week-dot locked" data-week="${w.num}" title="${w.title}"
+        href="#" onclick="return false">${w.num}</a>`;
+    }
+    const isActive = track === 'mahalakh'
+      ? currentWeek === w.num
+      : currentBikkurimWeek === w.num;
+    const clickFn = track === 'mahalakh'
+      ? `showWeek(${w.num})`
+      : `showBikkurimWeek(${w.num})`;
     const cls = ['week-dot', !isOpen ? 'locked' : '', isActive ? 'active' : ''].filter(Boolean).join(' ');
     return `<a class="${cls}" data-week="${w.num}" title="${w.title}"
-      href="#" onclick="${isOpen ? `showWeek(${w.num})` : 'return false'};return false">
+      href="#" onclick="${isOpen ? clickFn : 'return false'};return false">
       ${w.num}
     </a>`;
   }).join('');
+}
+
+// ===== אינדיקטור התקדמות =====
+function renderProgressBar() {
+  const bar = document.getElementById('progress-bar');
+  if (!bar) return;
+  
+  // חכה שה-bar יהיה גלוי
+  const width = bar.getBoundingClientRect().width;
+  if (width === 0) {
+    setTimeout(renderProgressBar, 50);
+    return;
+  }
+  
+  const omerDay = Math.min(Math.max(getTodayOmerDay(), 0), 49);
+  const weekGaps = 6 * 4;
+  const brickGaps = 48 * 2;
+  const brickWidth = Math.floor((width - weekGaps - brickGaps) / 49);
+
+  bar.innerHTML = '';
+  bar.style.cssText = 'display:flex;flex-direction:row;height:8px;width:100%;';
+  
+  for (let i = 1; i <= 49; i++) {
+    const div = document.createElement('div');
+    div.style.cssText = `width:${brickWidth}px;height:8px;border-radius:2px;flex-shrink:0;background:${i <= omerDay ? '#C8973A' : 'rgba(255,255,255,0.15)'};margin-left:${i % 7 === 0 ? '4px' : '2px'};`;
+    bar.appendChild(div);
+  }
+}
+
+// ===== שמור לאחר כך =====
+function toggleSave(cardId) {
+  const saved = JSON.parse(localStorage.getItem('saved_cards') || '[]');
+  const idx = saved.indexOf(cardId);
+  if (idx === -1) saved.push(cardId);
+  else saved.splice(idx, 1);
+  localStorage.setItem('saved_cards', JSON.stringify(saved));
+  updateSaveButton(cardId);
+}
+
+function isSaved(cardId) {
+  const saved = JSON.parse(localStorage.getItem('saved_cards') || '[]');
+  return saved.includes(cardId);
+}
+
+function updateSaveButton(cardId) {
+  const btn = document.getElementById('save-' + cardId);
+  if (!btn) return;
+  btn.textContent = isSaved(cardId) ? '★ שמור' : '☆ שמור';
+  btn.style.color = isSaved(cardId) ? 'var(--gold)' : '';
 }
 
 // ===== RENDER: BOTTOM NAV =====
@@ -109,10 +172,12 @@ function showIntro() {
   localStorage.removeItem('shiva_visited');
   document.getElementById('intro-page').style.display = 'flex';
   document.getElementById('week-page').style.display = 'none';
+  const bp = document.getElementById('bikkurim-page');
+  if (bp) bp.style.display = 'none';
   renderHeaderDots();
   renderWeeksNav();
 
-  // כדורי שבועות
+  // כדורי שבועות מהלך
   const unlocked = getUnlockedWeeks();
   document.getElementById('weeks-preview-pills').innerHTML = WEEKS.map(w => {
     const locked = !unlocked.includes(w.num);
@@ -122,6 +187,20 @@ function showIntro() {
       ${w.title}${locked ? ' 🔒' : ''}
     </span>`;
   }).join('');
+
+  // כדורי שבועות ביכורים
+  const bpEl = document.getElementById('bikkurim-weeks-preview');
+  if (bpEl && typeof BIKKURIM_CONTENT !== 'undefined') {
+    const bWeekNums = ['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ז׳'];
+    bpEl.innerHTML = BIKKURIM_CONTENT.map((w, i) => {
+      const isUnlocked = unlocked.includes(i + 1);
+      return `<span class="bikkurim-week-pill ${!isUnlocked ? 'locked' : ''}"
+        style="background:${w.color}${isUnlocked ? 'cc' : '44'};border-color:${w.color}66;color:white;"
+        onclick="${isUnlocked ? `showBikkurimWeek(${i+1})` : ''}">
+        ${w.title}${!isUnlocked ? ' 🔒' : ''}
+      </span>`;
+    }).join('');
+  }
 
   // ספירה לאחור / מצב שוטף
   const omerDay = getTodayOmerDay();
@@ -138,14 +217,22 @@ if (omerDay < 1) {
     const week = Math.ceil(omerDay / 7);
     const dayInWeek = omerDay - (week - 1) * 7;
     const omerText = formatOmerCount(omerDay, week, dayInWeek);
-    ct.innerHTML = `${omerText} — <a href="#" onclick="showWeek(${week});return false;" 
-      style="color:var(--gold-light);text-decoration:underline;text-underline-offset:3px;">
-      לתכנים של היום ←</a>`;
+    ct.innerHTML = omerText;
+    // הצג כפתורי "היום" בכל עמודה
+    const btnM = document.getElementById('today-btn-mahalakh');
+    const btnB = document.getElementById('today-btn-bikkurim');
+    if (btnM) { btnM.style.display = 'inline-block'; btnM.textContent = `← לתוכן היומי`; }
+    if (btnB) { btnB.style.display = 'inline-block'; }
   } else {
     ct.innerHTML = `ספירת העומר הסתיימה – כל התכנים פתוחים`;
   }
 
   history.pushState({}, '', window.location.pathname);
+
+  renderProgressBar();
+document.getElementById('progress-bar').style.display = 'block';
+  renderProgressBar();
+
 }
 
 // ===== RENDER: WEEK PAGE =====
@@ -166,7 +253,7 @@ function showWeek(weekNum) {
   currentWeek = weekNum;
   const week = WEEKS[weekNum - 1];
   const dayProgress = getWeekDayProgress(weekNum);
-  const isPastWeek = unlocked[unlocked.length - 1] > weekNum;
+  const isPastWeek = unlocked[unlocked.length - 1] >= weekNum && getWeekDayProgress(weekNum) > 7;
 
   document.getElementById('intro-page').style.display = 'none';
   document.getElementById('week-page').style.display = 'block';
@@ -181,13 +268,16 @@ function showWeek(weekNum) {
 
   // כרטיסי תוכן
   const cards = getWeekContent(weekNum);
-  document.getElementById('content-cards').innerHTML = cards.map((item, i) => {
+document.getElementById('content-cards').innerHTML = cards.map((item, i) => {
   const isVisible = isPastWeek || isItemVisible(item, dayProgress);
-    return renderCard(item, week.color, isVisible, i);
-  }).join('');
+  return renderCard(item, week.color, isVisible, i);
+}).join('');
+// עדכן כפתורי שמירה אחרי שה-DOM מוכן
+cards.forEach(item => updateSaveButton(item.id));
 
   renderHeaderDots();
   renderWeeksNav();
+
   // גלול לפריט היומי אם זה השבוע הנוכחי
   const omerDay = getTodayOmerDay();
   const todayWeek = Math.ceil(omerDay / 7);
@@ -203,14 +293,20 @@ function showWeek(weekNum) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   history.pushState({ week: weekNum }, '', `#שבוע-${weekNum}`);
+
+  renderProgressBar();
+document.getElementById('progress-bar').style.display = 'block';
+  renderProgressBar();
+
 }
 
 // ===== RENDER: CARD =====
 function getTypeIcon(type) {
   const icons = {
     'פתיחה':  '✦',
-    'שבת':    '🕯',
-    'מוצש':   '✶',
+    'לקראת שבת':    '🕯',
+    'שביעי של פסח':    '🕯',
+    'יוצאים לימי המעשה':   '✶',
     'לימוד':  '📖',
     'זווית':  '↗',
     'העמקה':  '◎',
@@ -223,6 +319,15 @@ function getTypeIcon(type) {
   return icons[type] || '';
 }
 
+function formatText(text) {
+  if (!text) return '';
+  return text
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+    .join('<br><br>');
+}
+
 function renderCard(item, color, isVisible, index) {
   if (!isVisible) {
     return `<div class="content-card locked-card" style="animation-delay:${index * 0.06}s">
@@ -233,12 +338,23 @@ function renderCard(item, color, isVisible, index) {
   const isFeatured = item.type === 'פתיחה';
   const cardClass = `content-card${isFeatured ? ' card-featured' : ''}`;
 
-  const videoHtml = item.videoId
-    ? `<div class="video-wrapper">
-        <iframe src="https://www.youtube.com/embed/${item.videoId}"
-          title="${item.title}" allowfullscreen loading="lazy"></iframe>
-       </div>`
-    : '';
+const imageHtml = item.image
+  ? `<img src="${item.image}" alt="${item.title}"
+      style="width:100%;border-radius:8px;margin-bottom:16px;display:block;">`
+  : '';
+
+const videoHtml = item.videoId
+  ? `<a href="https://youtube.com/watch?v=${item.videoId}" target="_blank"
+      style="display:block;position:relative;border-radius:8px;overflow:hidden;margin-bottom:16px;">
+      <img src="https://img.youtube.com/vi/${item.videoId}/mqdefault.jpg"
+        style="width:100%;display:block;">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);">
+        <div style="width:48px;height:48px;background:red;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+          <div style="width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-right:none;border-left:16px solid white;margin-right:-4px;"></div>
+        </div>
+      </div>
+    </a>`
+  : '';
 
   const questionHtml = item.question
     ? `<div class="card-question">${item.question}</div>`
@@ -247,12 +363,10 @@ function renderCard(item, color, isVisible, index) {
   const needsReadMore = !isFeatured && item.excerpt && item.excerpt.length > 120;
   const excerptHtml = needsReadMore
     ? `<div class="card-excerpt-wrap">
-        <p class="card-excerpt collapsed" id="exc-${item.id}">${item.excerpt}</p>
-       </div>
+       <p class="card-excerpt collapsed" id="exc-${item.id}">${formatText(item.excerpt)}</p>       </div>
        <button class="read-more-btn" id="rmb-${item.id}"
          onclick="toggleReadMore('${item.id}')" style="color:${color}">קרא עוד ↓</button>`
-    : `<p class="card-excerpt" style="margin-bottom:14px">${item.excerpt}</p>`;
-
+      : `<p class="card-excerpt" style="margin-bottom:14px">${formatText(item.excerpt)}</p>`;
   // תגיות קשורות (לשימוש עתידי – מוצגות בשקט כ-data attributes)
   const tagsAttr = item.tags ? `data-tags="${item.tags.join(',')}"` : '';
   const relatedAttr = item.related ? `data-related="${item.related.join(',')}"` : '';
@@ -265,13 +379,18 @@ function renderCard(item, color, isVisible, index) {
     <h2 class="card-title">${item.title}</h2>
     </div>
     <div class="card-body">
+      ${imageHtml}
       ${videoHtml}
       ${excerptHtml}
       ${questionHtml}
       <div class="card-meta">
-        <span class="card-day">יום ${item.day} בשבוע</span>
-        <button class="card-share-btn" onclick="shareCard('${item.id}')">שתף ↗</button>
-      </div>
+  <span class="card-day">יום ${item.day} בשבוע</span>
+  <div style="display:flex;gap:8px;">
+    <button class="card-share-btn" id="save-${item.id}" 
+      onclick="toggleSave('${item.id}')">☆ שמור</button>
+    <button class="card-share-btn" onclick="shareCard('${item.id}')">שתף ↗</button>
+  </div>
+</div>
     </div>
   </div>`;
 }
@@ -288,13 +407,16 @@ function toggleReadMore(id) {
 }
 
 // ===== PASUK TOGGLE =====
-function togglePasuk() {
-  const txt = document.getElementById('pasuk-text');
-  const btn = document.getElementById('pasuk-btn');
+function togglePasuk(track) {
+  const id = track || 'mahalakh';
+  const txt = document.getElementById('pasuk-text-' + id);
+  const btn = document.getElementById('pasuk-btn-' + id);
+  if (!txt) return;
   const isOpen = txt.style.maxHeight && txt.style.maxHeight !== '0px';
-  txt.style.maxHeight = isOpen ? '0' : '1200px';
+  txt.style.maxHeight = isOpen ? '0' : '1400px';
   txt.style.opacity = isOpen ? '0' : '1';
-  btn.textContent = isOpen ? '✦ יוצאים לדרך' : '✦ סגור';
+  const icon = id === 'bikkurim' ? '📖' : '✦';
+  btn.textContent = isOpen ? `${icon} יוצאים לדרך` : `${icon} סגור`;
 }
 
 // ===== SHARING =====
@@ -333,11 +455,13 @@ if (hasVisitedOnce && omerDay >= 1 && omerDay <= 49) {
 }
 
 function goHome() {
-  console.log('goHome called, hasVisitedOnce:', hasVisitedOnce);
-
-  hasVisitedOnce = false;  currentWeek = null;
+  hasVisitedOnce = false;
+  currentWeek = null;
+  if (typeof currentBikkurimWeek !== 'undefined') currentBikkurimWeek = null;
   window.location.hash = '';
   showIntro();
 }
 
-window.addEventListener('DOMContentLoaded', handleHash);
+window.addEventListener('DOMContentLoaded', () => {
+  handleHash();
+});
