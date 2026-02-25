@@ -126,19 +126,26 @@ function renderBikkurimText(weekData, highlightDay) {
 // ===== FOCUS PANEL =====
 function renderBikkurimFocus(weekData, dayProgress, activeFocusDay) {
   const panel = document.getElementById('bikkurim-focus-panel');
+  const mobileBar = document.getElementById('mobile-day-bar');
 
-  const tabsHtml = `<div class="day-tabs">
-    ${weekData.focuses.map(f => {
-      const visible = isBikkurimFocusVisible(f, dayProgress);
-      return `<button class="day-tab ${f.day === activeFocusDay ? 'active-tab' : ''} ${!visible ? 'locked-tab' : ''}"
-        onclick="${visible ? `selectBikkurimDay(${f.day})` : ''}"
-        title="${BIKKURIM_DAY_NAMES[f.day-1]}">${f.day}</button>`;
-    }).join('')}
-  </div>`;
+  const tabsHtml = weekData.focuses.map(f => {
+    const visible = isBikkurimFocusVisible(f, dayProgress);
+    return `<button class="day-tab ${f.day === activeFocusDay ? 'active-tab' : ''} ${!visible ? 'locked-tab' : ''}"
+      onclick="${visible ? `selectBikkurimDay(${f.day})` : ''}"
+      title="${BIKKURIM_DAY_NAMES[f.day-1]}">${f.day}</button>`;
+  }).join('');
+
+  // עדכן סרגל נייד
+  if (mobileBar) {
+    mobileBar.style.display = 'flex';
+    mobileBar.innerHTML = tabsHtml;
+  }
+
+  const desktopTabs = `<div class="day-tabs">${tabsHtml}</div>`;
 
   const focus = weekData.focuses.find(f => f.day === activeFocusDay);
   if (!focus || !isBikkurimFocusVisible(focus, dayProgress)) {
-    panel.innerHTML = tabsHtml +
+    panel.innerHTML = desktopTabs +
       `<div class="focus-card"><p style="color:rgba(245,240,232,0.4);font-size:0.85rem;">פוקוס זה עוד לא נפתח</p></div>`;
     return;
   }
@@ -149,7 +156,7 @@ function renderBikkurimFocus(weekData, dayProgress, activeFocusDay) {
         פירושים בספריא ↗</a>`
     : '';
 
-  panel.innerHTML = tabsHtml + `
+  panel.innerHTML = desktopTabs + `
     <div class="focus-card">
       <p class="focus-day-label">יום ${focus.day} – ${BIKKURIM_DAY_NAMES[focus.day-1]}</p>
       <h3 class="focus-title">${focus.title}</h3>

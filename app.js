@@ -7,7 +7,7 @@
 // ----- הגדרת תאריך -----
 // היום הראשון של ספירת העומר (ליל הסדר – מהשקיעה)
 // פורמט: 'YYYY-MM-DDThh:mm:ss' – השעה קובעת מאיזה רגע השבוע נפתח
-const OMER_START = new Date('2026-02-01T20:00:00');
+const OMER_START = new Date('2026-02-18T20:00:00');
 const OMER_END = new Date('2026-05-22T00:00:00'); // שבועות תשפ"ו – אחרי זה הכל פתוח
 
 // ===== STATE =====
@@ -174,6 +174,8 @@ function showIntro() {
   document.getElementById('week-page').style.display = 'none';
   const bp = document.getElementById('bikkurim-page');
   if (bp) bp.style.display = 'none';
+  const mobileBar = document.getElementById('mobile-day-bar');
+  if (mobileBar) mobileBar.style.display = 'none';
   renderHeaderDots();
   renderWeeksNav();
 
@@ -221,7 +223,7 @@ if (omerDay < 1) {
     // הצג כפתורי "היום" בכל עמודה
     const btnM = document.getElementById('today-btn-mahalakh');
     const btnB = document.getElementById('today-btn-bikkurim');
-    if (btnM) { btnM.style.display = 'inline-block'; btnM.textContent = `← לתוכן היומי`; }
+    if (btnM) { btnM.style.display = 'inline-block'; btnM.textContent = `← לתכנים של היום (${WEEKS[week-1]?.title || 'שבוע ' + week})`; }
     if (btnB) { btnB.style.display = 'inline-block'; }
   } else {
     ct.innerHTML = `ספירת העומר הסתיימה – כל התכנים פתוחים`;

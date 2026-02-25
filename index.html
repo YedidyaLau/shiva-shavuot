@@ -448,7 +448,44 @@
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  /* ===== RESPONSIVE ===== */
+  /* ===== סרגל ימים צף – נייד ===== */
+  .mobile-day-bar {
+    display: none;
+  }
+  @media (max-width: 700px) {
+    .mobile-day-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--ink);
+      border-top: 1px solid rgba(200,151,58,0.25);
+      display: flex !important;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 12px 14px;
+      z-index: 200;
+    }
+    .mobile-day-bar .day-tab {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(245,240,232,0.5);
+      font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+      font-family: 'Heebo', sans-serif;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mobile-day-bar .day-tab.active-tab {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--ink);
+    }
+    .mobile-day-bar .day-tab.locked-tab {
+      opacity: 0.25; cursor: default;
+    }
+    /* רווח תחתון לדף כדי שהסרגל לא יחפוף תוכן */
+    #bikkurim-page { padding-bottom: 70px; }
+  }
   @media (max-width: 700px) {
     .site-header { padding: 16px 20px; }
     .week-hero { padding: 40px 20px 32px; }
@@ -527,7 +564,7 @@
       <button id="today-btn-mahalakh" onclick="enterTrack('mahalakh')"
         style="display:none;background:rgba(200,151,58,0.15);border:1px solid rgba(200,151,58,0.35);color:var(--gold-light);padding:9px 18px;border-radius:100px;font-family:Heebo,sans-serif;font-size:0.82rem;cursor:pointer;margin-bottom:12px;transition:all 0.2s;"
         onmouseover="this.style.background='rgba(200,151,58,0.25)'" onmouseout="this.style.background='rgba(200,151,58,0.15)'">
-        ← לתוכן היומי
+        ← לתכנים של היום
       </button>
 
       <!-- ווטסאפ -->
@@ -543,7 +580,7 @@
     <!-- מסלול ביכורים -->
     <div class="track-col">
       <h2 class="track-col-title">📖 לימוד ביכורים</h2>
-      <p class="track-col-desc">לימוד משנה שיטתי לאורך שבעת השבועות – ממנחת העומר בפסח ועד שתי הלחם בשבועות, דרך מסכת ביכורים .</p>
+      <p class="track-col-desc">לימוד שיטתי לאורך שבעת שבועות – ממשנת מנחות, דרך מקרא ביכורים ומסכת ביכורים, ועד שתי הלחם.</p>
 
       <!-- יוצאים לדרך -->
       <button onclick="togglePasuk('bikkurim')" id="pasuk-btn-bikkurim" class="yotzim-btn">
@@ -557,9 +594,9 @@
           </p>
           <p class="yotzim-source">דברים כו, א</p>
           <div class="yotzim-text">
-            <p>המובן הראשוני של ספירת העומר הוא תקופת הביכורים. מקציר השעורים למנחת העומר והיתר השימוש בתבואה החדשה בפסח, ועד להנפת שתי הלחם, ביכורי החיטים, בשבועות. </p>
-            <p>במהלך הספירה, נלמד בכל שבוע פרק אחר במשנה. בשבוע הראשון והאחרון נלמד פרקים ממסכת מנחות - על העומר (פרק י) ועל שתי הלחם (פרק יא). בתווך, נלמד את כל משנת מסכת ביכורים, ונקדיש שבוע להעמקה בפסוקי מקרא ביכורים ושבוע להרחבות נוספות </p>
-            <p>הפרק כולו זמין מתחילת השבוע – ובכל יום יום מדגישים חלק אחר ומעמיקים בו.</p>
+            <p>מהקציר הראשון ועד שתי הלחם – שבעת שבועות הספירה הם מסע בעולם הביכורים. מה משמעות ה"ראשית"? מי מביא ביכורים ומי אינו מביא? מה קורה כשמגיעים לירושלים?</p>
+            <p>בכל שבוע נלמד פרק שלם – טקסט קצר, מדויק, עשיר. שבוע א': הבאת העומר (מנחות י'). שבועות ב': מקרא ביכורים. שבועות ג'-ה': מסכת ביכורים. שבוע ו': זוויות נוספות. שבוע ז': שתי הלחם (מנחות י"א).</p>
+            <p>הפרק כולו זמין מהתחלה – יום יום מדגישים חלק ושואלים שאלה.</p>
           </div>
         </div>
       </div>
@@ -571,7 +608,7 @@
       <button id="today-btn-bikkurim" onclick="enterTrack('bikkurim')"
         style="display:none;background:rgba(200,151,58,0.15);border:1px solid rgba(200,151,58,0.35);color:var(--gold-light);padding:9px 18px;border-radius:100px;font-family:Heebo,sans-serif;font-size:0.82rem;cursor:pointer;margin-bottom:12px;transition:all 0.2s;"
         onmouseover="this.style.background='rgba(200,151,58,0.25)'" onmouseout="this.style.background='rgba(200,151,58,0.15)'">
-        ← ללימוד היומי
+        ← ללימוד של היום
       </button>
 
       <!-- ווטסאפ -->
@@ -636,6 +673,9 @@
     </div>
   </div>
 </section>
+
+<!-- סרגל ימים צף לנייד -->
+<div class="mobile-day-bar" id="mobile-day-bar" style="display:none;"></div>
 
 <nav class="weeks-nav" id="weeks-nav">
   <div class="weeks-nav-inner" id="weeks-nav-inner"></div>
