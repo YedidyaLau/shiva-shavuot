@@ -16,9 +16,11 @@ let hasVisitedOnce = false;
 
 // ===== OMER DATE LOGIC =====
 function getTodayOmerDay() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('day')) return parseInt(params.get('day'));
   const now = new Date();
   const diff = now - OMER_START;
-  if (diff < 0) return 0; // לפני הספירה
+  if (diff < 0) return 0;
   return Math.floor(diff / 86400000) + 1;
 }
 
