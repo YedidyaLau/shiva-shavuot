@@ -90,7 +90,9 @@ function showBikkurimWeek(weekNum) {
 
   renderProgressBar(); // מ-app.js
   window.scrollTo({ top: 0, behavior: 'smooth' });
-  history.pushState({ bikkurim: weekNum }, '', `#ביכורים-${weekNum}`);
+  const dayParam = new URLSearchParams(window.location.search).get('day');
+  const search = dayParam ? `?day=${dayParam}` : '';
+  history.pushState({ bikkurim: weekNum }, '', `${search}#ביכורים-${weekNum}`);
 }
 
 // ===== NAV =====

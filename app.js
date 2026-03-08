@@ -297,7 +297,9 @@ cards.forEach(item => updateSaveButton(item.id));
   } else {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-  history.pushState({ week: weekNum }, '', `#שבוע-${weekNum}`);
+  const dayParam = new URLSearchParams(window.location.search).get('day');
+  const search = dayParam ? `?day=${dayParam}` : '';
+  history.pushState({ week: weekNum }, '', `${search}#שבוע-${weekNum}`);
 
   renderProgressBar();
 document.getElementById('progress-bar').style.display = 'block';
