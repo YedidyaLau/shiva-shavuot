@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>שבעה שבועות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --warm-white: #FAF7F2;
+    --ink: #1C1A17;
+    --ink-light: #4A4540;
+    --ink-faint: #9A9088;
+    --gold: #C8973A;
+    --gold-light: #E8C97A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: var(--warm-white);
+    color: var(--ink);
+    min-height: 100vh;
+    direction: rtl;
+  }
+
+  /* ===== HEADER ===== */
+  .site-header {
+    background: var(--ink);
+    padding: 20px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .site-logo {
+    font-weight: 800; font-size: 1.3rem;
+    color: var(--gold); text-decoration: none;
+  }
+  .header-nav { display: flex; gap: 8px; align-items: center; }
+  .week-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; font-weight: 500; color: white;
+    transition: all 0.2s; text-decoration: none;
+  }
+  .week-dot:hover { transform: scale(1.15); }
+  .week-dot.locked { opacity: 0.3; cursor: default; }
+  .week-dot.locked:hover { transform: none; }
+  .week-dot.active { border-color: white; box-shadow: 0 0 0 1px white; }
+  .week-dot[data-week="1"] { background: #7A8C6E; }
+  .week-dot[data-week="2"] { background: #5B7FA6; }
+  .week-dot[data-week="3"] { background: #C47A6E; }
+  .week-dot[data-week="4"] { background: #8B6BA8; }
+  .week-dot[data-week="5"] { background: #A67C52; }
+  .week-dot[data-week="6"] { background: #6B9E8B; }
+  .week-dot[data-week="7"] { background: #C8973A; }
+
+  /* ===== INTRO ===== */
+#intro-page {
+  min-height: calc(100vh - 68px);
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  text-align: center; padding: 60px 24px 80px;
+  background: var(--ink); color: var(--cream);
+  position: relative;
+}
+
+#intro-page::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 70%, rgba(200,151,58,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 20%, rgba(122,140,110,0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.intro-subtitle {
+    font-weight: 300; font-size: 0.85rem; letter-spacing: 0.2em;
+    color: var(--gold); text-transform: uppercase; margin-bottom: 24px;
+    opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .intro-title {
+    font-weight: 900; font-size: clamp(3.5rem, 12vw, 8rem);
+    line-height: 1; margin-bottom: 32px;
+    opacity: 0; animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .intro-body {
+    max-width: 560px; font-weight: 300; font-size: 1.1rem;
+    line-height: 1.8; color: rgba(245,240,232,0.8);
+    opacity: 0; animation: fadeUp 0.8s 0.6s forwards; margin-bottom: 32px;
+  }
+  .weeks-preview {
+    display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+    opacity: 0; animation: fadeUp 0.8s 0.8s forwards; margin-bottom: 48px;
+  }
+  .week-pill {
+    padding: 8px 18px; border-radius: 100px;
+    font-size: 0.8rem; font-weight: 400; color: white;
+  }
+  .week-pill[data-week="1"] { background: #7A8C6E; }
+  .week-pill[data-week="2"] { background: #5B7FA6; }
+  .week-pill[data-week="3"] { background: #C47A6E; }
+  .week-pill[data-week="4"] { background: #8B6BA8; }
+  .week-pill[data-week="5"] { background: #A67C52; }
+  .week-pill[data-week="6"] { background: #6B9E8B; }
+  .week-pill[data-week="7"] { background: #C8973A; }
+  .intro-countdown {
+    font-size: 1rem; color: var(--gold-light);
+    opacity: 0; animation: fadeUp 0.8s 1s forwards;
+  }
+  .intro-countdown span { font-weight: 700; font-size: 1.4rem; }
+
+  /* ===== WEEK PAGE ===== */
+  #week-page { display: none; }
+  .week-hero { padding: 60px 32px 40px; position: relative; overflow: hidden; }
+  .week-hero::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(to left, transparent, var(--ink-faint), transparent);
+  }
+  .week-number-label {
+    font-size: 0.75rem; letter-spacing: 0.2em;
+    color: var(--ink-faint); text-transform: uppercase; margin-bottom: 12px;
+  }
+  .week-title-main {
+    font-weight: 900; font-size: clamp(3rem, 10vw, 6rem);
+    line-height: 1; margin-bottom: 16px;
+  }
+  .week-accent-bar { height: 4px; width: 60px; border-radius: 2px; margin: 24px 0; }
+  .week-tagline { font-size: 1rem; font-weight: 300; color: var(--ink-light); max-width: 480px; line-height: 1.7; }
+
+  /* ===== CONTENT GRID ===== */
+  .content-area { max-width: 1100px; margin: 0 auto; padding: 40px 32px 100px; }
+  .content-section-label {
+    font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--ink-faint); margin-bottom: 28px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--cream);
+  }
+  .content-cards { columns: 2; column-gap: 24px; margin-bottom: 48px; }
+  .content-card {
+    background: white; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 2px 16px rgba(28,26,23,0.07);
+    transition: transform 0.22s, box-shadow 0.22s;
+    animation: fadeUp 0.5s both;
+    break-inside: avoid; margin-bottom: 24px;
+    display: inline-block; width: 100%;
+  }
+  .content-card:nth-child(4n+1) { transform: rotate(-0.4deg); }
+  .content-card:nth-child(4n+3) { transform: rotate(0.3deg); }
+  .content-card:hover { transform: translateY(-3px) rotate(0deg) !important; box-shadow: 0 10px 32px rgba(28,26,23,0.13); }
+  .content-card.locked-card { opacity: 0.45; cursor: default; filter: grayscale(0.4); }
+  .content-card.locked-card:hover { transform: none !important; box-shadow: 0 2px 16px rgba(28,26,23,0.07); }
+
+  .content-card.card-featured {
+    column-span: all; transform: none !important;
+    background: var(--ink); color: var(--cream); margin-bottom: 32px;
+  }
+  .content-card.card-featured:hover { transform: translateY(-2px) !important; }
+  .card-featured .card-type-badge { background: rgba(255,255,255,0.12); color: rgba(245,240,232,0.8); }
+  .card-featured .card-title { color: var(--cream); font-size: 1.6rem; }
+  .card-featured .card-excerpt { color: rgba(245,240,232,0.75); }
+  .card-featured .card-meta { border-top-color: rgba(255,255,255,0.1); }
+  .card-featured .card-day { color: rgba(245,240,232,0.4); }
+  .card-featured .card-share-btn { color: rgba(245,240,232,0.5); }
+  .card-featured .card-share-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+  .card-featured .card-question { background: rgba(255,255,255,0.08); border-right-color: var(--gold); color: var(--cream); }
+
+  .card-top { display: flex; align-items: flex-start; gap: 14px; padding: 22px 22px 0; }
+  .card-type-badge {
+    font-size: 0.62rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 100px; background: var(--cream); color: var(--ink-light);
+    white-space: nowrap; flex-shrink: 0; margin-top: 3px; border-right: 2px solid transparent;
+  }
+  .card-title { font-weight: 800; font-size: 1.15rem; line-height: 1.35; flex: 1; }
+  .card-body { padding: 14px 22px 20px; }
+
+  .card-excerpt-wrap { position: relative; margin-bottom: 14px; }
+  .card-excerpt { font-size: 0.93rem; line-height: 1.75; color: var(--ink-light); overflow: hidden; transition: max-height 0.4s ease; }
+  .card-excerpt.collapsed {
+    max-height: 7.5em;
+    -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+  }
+  .card-excerpt.expanded { max-height: 6000px; mask-image: none; -webkit-mask-image: none; }
+  .read-more-btn {
+    background: none; border: none; padding: 0; font-size: 0.82rem; font-weight: 600;
+    cursor: pointer; font-family: 'Heebo', sans-serif; margin-bottom: 14px; display: block; transition: opacity 0.15s;
+  }
+  .read-more-btn:hover { opacity: 0.7; }
+
+  .card-question {
+    background: var(--cream); border-radius: 8px; padding: 13px 15px;
+    font-size: 0.88rem; line-height: 1.65; color: var(--ink);
+    border-right: 3px solid var(--gold); margin-bottom: 14px;
+  }
+  .card-question::before { content: 'לשיחה: '; font-weight: 700; color: var(--gold); }
+
+  .card-meta { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--cream); }
+  .card-day { font-size: 0.72rem; color: var(--ink-faint); }
+  .card-share-btn {
+    background: none; border: none; cursor: pointer; font-size: 0.78rem; color: var(--ink-faint);
+    display: flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px;
+    transition: background 0.15s, color 0.15s; font-family: 'Heebo', sans-serif;
+  }
+  .card-share-btn:hover { background: var(--cream); color: var(--ink); }
+  .locked-overlay { display: flex; align-items: center; gap: 8px; padding: 20px 24px; font-size: 0.85rem; color: var(--ink-faint); }
+
+  /* ===== VIDEO ===== */
+  .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 8px; overflow: hidden; margin-bottom: 16px; background: var(--ink); }
+  .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+  /* ===== BOTTOM NAV ===== */
+  .weeks-nav { background: white; border-top: 1px solid var(--cream); padding: 20px 24px; position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; display: none; }
+  .weeks-nav-inner { max-width: 860px; margin: 0 auto; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+  .weeks-nav-inner::-webkit-scrollbar { display: none; }
+  .week-tab {
+    flex-shrink: 0; padding: 8px 16px; border-radius: 8px; font-size: 0.8rem; font-weight: 500;
+    cursor: pointer; border: 2px solid transparent; background: var(--cream); color: var(--ink-light);
+    transition: all 0.2s; font-family: 'Heebo', sans-serif;
+  }
+  .week-tab.active-tab { color: white; }
+  .week-tab.locked-tab { opacity: 0.4; cursor: default; }
+  .week-tab[data-week="1"].active-tab { background: #7A8C6E; }
+  .week-tab[data-week="2"].active-tab { background: #5B7FA6; }
+  .week-tab[data-week="3"].active-tab { background: #C47A6E; }
+  .week-tab[data-week="4"].active-tab { background: #8B6BA8; }
+  .week-tab[data-week="5"].active-tab { background: #A67C52; }
+  .week-tab[data-week="6"].active-tab { background: #6B9E8B; }
+  .week-tab[data-week="7"].active-tab { background: #C8973A; }
+
+  /* ===== UTILS ===== */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: white; padding: 10px 20px; border-radius: 8px;
+    font-size: 0.85rem; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 200; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 700px) {
+    .site-header { padding: 16px 20px; }
+    .week-hero { padding: 40px 20px 32px; }
+    .content-area { padding: 32px 16px 100px; }
+    .content-cards { columns: 1; }
+    .content-card:nth-child(4n+1), .content-card:nth-child(4n+3) { transform: none; }
+    .card-top { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+<a href="#" class="site-logo" onclick="goHome();return false;">שבעה שבועות</a>  <nav class="header-nav" id="header-dots"></nav>
+</header>
+
+<!-- אינדיקטור התקדמות -->
+<div style="background:var(--ink);padding:6px 32px;box-sizing:border-box;width:100%;">
+  <div id="progress-bar" style="display:flex;flex-direction:row;height:8px;width:100%;box-sizing:border-box;"></div>
+</div>
+
+<!-- דף פתיחה -->
+<main id="intro-page">
+  <p class="intro-subtitle">ספירת העומר תשפ״ו</p>
+  <h1 class="intro-title">שבעה<br>שבועות</h1>
+  <p class="intro-body">
+    מפסח ועד שבועות – שבעה שבועות של ספירה. בכל שבוע נצא לבדוק יחד ממד אחד של החיים, ונשאל שאלות שאולי לא שאלנו.
+    הכניסה פתוחה לכולם. אין צורך לדעת לספור.
+  </p>
+
+  <div id="pasuk-section" style="opacity:0;animation:fadeUp 0.8s 0.7s forwards;margin-bottom:32px;">
+    <button onclick="togglePasuk()" id="pasuk-btn"
+      style="background:none;border:1px solid rgba(200,151,58,0.4);color:var(--gold);padding:8px 18px;border-radius:100px;font-family:Heebo,sans-serif;font-size:0.8rem;cursor:pointer;letter-spacing:0.08em;transition:all 0.2s;">
+      ✦ יוצאים לדרך
+    </button>
+    <div id="pasuk-text" style="max-height:0;overflow:hidden;transition:max-height 0.5s ease,opacity 0.4s;opacity:0;">
+      <div style="max-width:600px;margin:0 auto;text-align:right;">
+        <p style="font-size:1.1rem;line-height:2.1;color:rgba(245,240,232,0.9);margin-top:24px;font-weight:400;letter-spacing:0.04em;border-right:3px solid var(--gold);padding-right:16px;">
+          וְהָיָה אֱמוּנַת עִתֶּיךָ חֹסֶן יְשׁוּעֹת<br>
+          חׇכְמַת וָדָעַת יִרְאַת ה׳ הִיא אוֹצָרוֹ
+        </p>
+        <p style="font-size:0.72rem;color:rgba(245,240,232,0.3);margin-top:6px;margin-bottom:28px;padding-right:19px;">ישעיהו לג, ו</p>
+        <p style="font-size:0.65rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;font-weight:600;">על הפרויקט</p>
+        <div style="font-size:0.97rem;line-height:1.85;color:rgba(245,240,232,0.75);font-weight:300;">
+          <p style="margin-bottom:16px;">פסוק סתום לכאורה בספר ישעיהו מספר איך בתקופה משברית האדם יכול למצוא עוגן ומשמעות בלימוד ובאמונה. ישעיהו קובע מוטו: "לִמְדוּ הֵיטֵב" – והכוונה אינה להצטיין בלימודים, אלא ללמוד להיות טובים, ללמוד להיטיב.</p>
+          <p style="margin-bottom:16px;">בגמרא, חכמים לומדים את הפסוק הזה כמפתח לדרך החיים הראויה. כל מילה בפסוק, מלמד אותנו ריש לקיש, רומזת לאחד מסדרי המשנה – זרעים, מועד, נשים, נזיקין, קודשים וטהרות. רבא מעמיק ומלמד: כשבוחנים את מעשי האדם לאורך חייו, שואלים אותו שש שאלות – נשאת ונתת באמונה? קבעת עיתים לתורה? עסקת בפריה ורביה? צפית לישועה? פלפלת בחכמה? הבנת דבר מתוך דבר?</p>
+          <p style="margin-bottom:16px;">האדם נבחן בהתנהלות הארצית שלו – בחברה חקלאית, במצוות התלויות בארץ, ובחברה עירונית, במסחר; ביחסו לזמן; במשפחה; בתיקון החברתי שהוא רואה כמפתח לגאולה; בטהרת הגוף הקשורה לחכמה; ובמגע שלו עם הקודש, עם הנשגב.</p>
+          <p style="margin-bottom:24px;">ששה סדרי משנה מציעים ששה ממדים דרכם אפשר להסתכל על החיים ולשאול, משבוע לשבוע: איפה אני? ואיפה אני רוצה להיות?<br>ובסוף – הכל לשם שמים.</p>
+          <p style="color:rgba(245,240,232,0.5);font-size:0.88rem;border-top:1px solid rgba(255,255,255,0.08);padding-top:16px;margin-bottom:24px;">בהצלחה לנו!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="weeks-preview" id="weeks-preview-pills"></div>
+  <!-- מי אנחנו + ווטסאפ -->
+<div style="opacity:0;animation:fadeUp 0.8s 0.9s forwards;margin-bottom:40px;display:flex;flex-direction:column;align-items:center;gap:20px;">
+  
+  <!-- כרטיס מי אנחנו -->
+  <div style="display:flex;align-items:center;gap:16px;background:rgba(255,255,255,0.06);border:1px solid rgba(200,151,58,0.2);border-radius:16px;padding:16px 20px;max-width:400px;text-align:right;">
+    <img src="yedidya.jpg" alt="ידידיה לאו" 
+      style="width:56px;height:56px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(200,151,58,0.4);">
+    <div>
+      <p style="font-weight:700;font-size:0.95rem;color:var(--cream);margin-bottom:4px;">ידידיה לאו</p>
+      <p style="font-weight:300;font-size:0.8rem;color:rgba(245,240,232,0.6);line-height:1.5;">רב הישוב אלון וראש תכנית שטראוס להכשרת רבני קהילה. נשוי לתאנה, אבא לארבע בנות ובן, וכלכלן חובב.</p>
+      <p style="font-size:0.65rem;color:rgba(245,240,232,0.25);margin-top:4px;">צילום: מעיין שושני מרקוביץ</p>
+    </div>
+  </div>
+
+  <!-- כפתור ווטסאפ -->
+<a href="https://chat.whatsapp.com/IuH0Q9rr5Hl8St6Ra1mM6w" target="_blank"
+  style="display:inline-flex;align-items:center;gap:10px;background:#25D366;color:white;text-decoration:none;padding:11px 22px;border-radius:100px;font-size:0.85rem;font-weight:600;transition:opacity 0.2s;white-space:nowrap;"
+  onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="white" style="flex-shrink:0">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+  הצטרף לקבוצה – תזכורות יומיות
+</a>
+
+<p class="intro-countdown" id="countdown-text"></p>
+
+<!-- לוגואים -->
+<div style="opacity:0;animation:fadeUp 0.8s 1.1s forwards;margin-bottom:32px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+  <p style="font-size:0.65rem;letter-spacing:0.2em;color:rgba(245,240,232,0.3);text-transform:uppercase;">בשיתוף</p>
+  <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:center;">
+  <img src="logo-alon.jpg" alt="ישוב אלון" 
+    style="height:60px;background:white;padding:7px 12px;border-radius:6px;">
+  <img src="logo-kolel.jpg" alt="כולל מחניים" 
+    style="height:60px;background:white;padding:7px 12px;border-radius:6px;">  </div>
+</div>
+
+</main>
+
+<!-- דף שבוע -->
+<section id="week-page">
+  <div class="week-hero" id="week-hero">
+    <p class="week-number-label" id="week-number-label"></p>
+    <h1 class="week-title-main" id="week-title-main"></h1>
+    <div class="week-accent-bar" id="week-accent-bar"></div>
+    <p class="week-tagline" id="week-tagline"></p>
+  </div>
+  <div class="content-area">
+    <p class="content-section-label">תכנים שבוע זה</p>
+    <div class="content-cards" id="content-cards"></div>
+  </div>
+</section>
+
+<nav class="weeks-nav" id="weeks-nav">
+  <div class="weeks-nav-inner" id="weeks-nav-inner"></div>
+</nav>
+
+<div class="toast" id="toast">הקישור הועתק ✓</div>
+
+<!-- סדר הטעינה חשוב: תוכן לפני לוגיקה -->
+<script src="content.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
