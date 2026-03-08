@@ -7,7 +7,7 @@
 // ----- הגדרת תאריך -----
 // היום הראשון של ספירת העומר (ליל הסדר – מהשקיעה)
 // פורמט: 'YYYY-MM-DDThh:mm:ss' – השעה קובעת מאיזה רגע השבוע נפתח
-const OMER_START = new Date('2026-02-18T20:00:00');
+const OMER_START = new Date('2026-01-10T20:00:00');
 const OMER_END = new Date('2026-05-22T00:00:00'); // שבועות תשפ"ו – אחרי זה הכל פתוח
 
 // ===== STATE =====
@@ -47,12 +47,26 @@ function getWeekContent(weekNum) {
 // ===== RENDER: HEADER DOTS =====
 function renderHeaderDots() {
   const unlocked = getUnlockedWeeks();
+  const track = typeof currentBikkurimWeek !== 'undefined' && currentBikkurimWeek
+    ? 'bikkurim'
+    : (currentWeek ? 'mahalakh' : 'intro');
+
   document.getElementById('header-dots').innerHTML = WEEKS.map(w => {
     const isOpen = unlocked.includes(w.num);
-    const isActive = currentWeek === w.num;
+    // בדף הבית – כדורים נעולים תמיד
+    if (track === 'intro') {
+      return `<a class="week-dot locked" data-week="${w.num}" title="${w.title}"
+        href="#" onclick="return false">${w.num}</a>`;
+    }
+    const isActive = track === 'mahalakh'
+      ? currentWeek === w.num
+      : currentBikkurimWeek === w.num;
+    const clickFn = track === 'mahalakh'
+      ? `showWeek(${w.num})`
+      : `showBikkurimWeek(${w.num})`;
     const cls = ['week-dot', !isOpen ? 'locked' : '', isActive ? 'active' : ''].filter(Boolean).join(' ');
     return `<a class="${cls}" data-week="${w.num}" title="${w.title}"
-      href="#" onclick="${isOpen ? `showWeek(${w.num})` : 'return false'};return false">
+      href="#" onclick="${isOpen ? clickFn : 'return false'};return false">
       ${w.num}
     </a>`;
   }).join('');
@@ -158,10 +172,14 @@ function showIntro() {
   localStorage.removeItem('shiva_visited');
   document.getElementById('intro-page').style.display = 'flex';
   document.getElementById('week-page').style.display = 'none';
+  const bp = document.getElementById('bikkurim-page');
+  if (bp) bp.style.display = 'none';
+  const mobileBar = document.getElementById('mobile-day-bar');
+  if (mobileBar) mobileBar.style.display = 'none';
   renderHeaderDots();
   renderWeeksNav();
 
-  // כדורי שבועות
+  // כדורי שבועות מהלך
   const unlocked = getUnlockedWeeks();
   document.getElementById('weeks-preview-pills').innerHTML = WEEKS.map(w => {
     const locked = !unlocked.includes(w.num);
@@ -171,6 +189,20 @@ function showIntro() {
       ${w.title}${locked ? ' 🔒' : ''}
     </span>`;
   }).join('');
+
+  // כדורי שבועות ביכורים
+  const bpEl = document.getElementById('bikkurim-weeks-preview');
+  if (bpEl && typeof BIKKURIM_CONTENT !== 'undefined') {
+    const bWeekNums = ['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ז׳'];
+    bpEl.innerHTML = BIKKURIM_CONTENT.map((w, i) => {
+      const isUnlocked = unlocked.includes(i + 1);
+      return `<span class="bikkurim-week-pill ${!isUnlocked ? 'locked' : ''}"
+        style="background:${w.color}${isUnlocked ? 'cc' : '44'};border-color:${w.color}66;color:white;"
+        onclick="${isUnlocked ? `showBikkurimWeek(${i+1})` : ''}">
+        ${w.title}${!isUnlocked ? ' 🔒' : ''}
+      </span>`;
+    }).join('');
+  }
 
   // ספירה לאחור / מצב שוטף
   const omerDay = getTodayOmerDay();
@@ -187,9 +219,12 @@ if (omerDay < 1) {
     const week = Math.ceil(omerDay / 7);
     const dayInWeek = omerDay - (week - 1) * 7;
     const omerText = formatOmerCount(omerDay, week, dayInWeek);
-    ct.innerHTML = `${omerText} — <a href="#" onclick="showWeek(${week});return false;" 
-      style="color:var(--gold-light);text-decoration:underline;text-underline-offset:3px;">
-      לתכנים של היום ←</a>`;
+    ct.innerHTML = omerText;
+    // הצג כפתורי "היום" בכל עמודה
+    const btnM = document.getElementById('today-btn-mahalakh');
+    const btnB = document.getElementById('today-btn-bikkurim');
+    if (btnM) { btnM.style.display = 'inline-block'; btnM.textContent = `← לתוכן היומי`; }
+    if (btnB) { btnB.style.display = 'inline-block'; }
   } else {
     ct.innerHTML = `ספירת העומר הסתיימה – כל התכנים פתוחים`;
   }
@@ -204,6 +239,7 @@ document.getElementById('progress-bar').style.display = 'block';
 
 // ===== RENDER: WEEK PAGE =====
 function isItemVisible(item, dayProgress) {
+  if (dayProgress >= 7 && item.day === 7) return true; // שבוע הסתיים – יום 7 תמיד פתוח
   if (dayProgress < item.day) return false;
   if (dayProgress > item.day) return true;
   // אותו יום – בדוק שעה אם מוגדרת
@@ -220,7 +256,7 @@ function showWeek(weekNum) {
   currentWeek = weekNum;
   const week = WEEKS[weekNum - 1];
   const dayProgress = getWeekDayProgress(weekNum);
-  const isPastWeek = unlocked[unlocked.length - 1] > weekNum;
+  const isPastWeek = unlocked[unlocked.length - 1] >= weekNum && getWeekDayProgress(weekNum) >= 7;
 
   document.getElementById('intro-page').style.display = 'none';
   document.getElementById('week-page').style.display = 'block';
@@ -264,6 +300,10 @@ cards.forEach(item => updateSaveButton(item.id));
   renderProgressBar();
 document.getElementById('progress-bar').style.display = 'block';
   renderProgressBar();
+
+  const mobileBar = document.getElementById('mobile-day-bar');
+if (mobileBar) mobileBar.style.display = 'none';
+
 
 }
 
@@ -374,13 +414,16 @@ function toggleReadMore(id) {
 }
 
 // ===== PASUK TOGGLE =====
-function togglePasuk() {
-  const txt = document.getElementById('pasuk-text');
-  const btn = document.getElementById('pasuk-btn');
+function togglePasuk(track) {
+  const id = track || 'mahalakh';
+  const txt = document.getElementById('pasuk-text-' + id);
+  const btn = document.getElementById('pasuk-btn-' + id);
+  if (!txt) return;
   const isOpen = txt.style.maxHeight && txt.style.maxHeight !== '0px';
-  txt.style.maxHeight = isOpen ? '0' : '1200px';
+  txt.style.maxHeight = isOpen ? '0' : '1400px';
   txt.style.opacity = isOpen ? '0' : '1';
-  btn.textContent = isOpen ? '✦ יוצאים לדרך' : '✦ סגור';
+  const icon = id === 'bikkurim' ? '📖' : '✦';
+  btn.textContent = isOpen ? `${icon} יוצאים לדרך` : `${icon} סגור`;
 }
 
 // ===== SHARING =====
@@ -419,9 +462,9 @@ if (hasVisitedOnce && omerDay >= 1 && omerDay <= 49) {
 }
 
 function goHome() {
-  console.log('goHome called, hasVisitedOnce:', hasVisitedOnce);
-
-  hasVisitedOnce = false;  currentWeek = null;
+  hasVisitedOnce = false;
+  currentWeek = null;
+  if (typeof currentBikkurimWeek !== 'undefined') currentBikkurimWeek = null;
   window.location.hash = '';
   showIntro();
 }
