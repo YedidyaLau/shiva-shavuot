@@ -7,7 +7,7 @@
 // ----- הגדרת תאריך -----
 // היום הראשון של ספירת העומר (ליל הסדר – מהשקיעה)
 // פורמט: 'YYYY-MM-DDThh:mm:ss' – השעה קובעת מאיזה רגע השבוע נפתח
-const OMER_START = new Date('2026-02-18T20:00:00');
+const OMER_START = new Date('2026-04-02T20:00:00');
 const OMER_END = new Date('2026-05-22T00:00:00'); // שבועות תשפ"ו – אחרי זה הכל פתוח
 
 // ===== STATE =====
@@ -223,7 +223,7 @@ if (omerDay < 1) {
     // הצג כפתורי "היום" בכל עמודה
     const btnM = document.getElementById('today-btn-mahalakh');
     const btnB = document.getElementById('today-btn-bikkurim');
-    if (btnM) { btnM.style.display = 'inline-block'; btnM.textContent = `← לתכנים של היום (${WEEKS[week-1]?.title || 'שבוע ' + week})`; }
+    if (btnM) { btnM.style.display = 'inline-block'; btnM.textContent = `← לתוכן היומי`; }
     if (btnB) { btnB.style.display = 'inline-block'; }
   } else {
     ct.innerHTML = `ספירת העומר הסתיימה – כל התכנים פתוחים`;
@@ -239,6 +239,7 @@ document.getElementById('progress-bar').style.display = 'block';
 
 // ===== RENDER: WEEK PAGE =====
 function isItemVisible(item, dayProgress) {
+  if (dayProgress >= 7 && item.day === 7) return true; // שבוע הסתיים – יום 7 תמיד פתוח
   if (dayProgress < item.day) return false;
   if (dayProgress > item.day) return true;
   // אותו יום – בדוק שעה אם מוגדרת
@@ -255,7 +256,7 @@ function showWeek(weekNum) {
   currentWeek = weekNum;
   const week = WEEKS[weekNum - 1];
   const dayProgress = getWeekDayProgress(weekNum);
-  const isPastWeek = unlocked[unlocked.length - 1] >= weekNum && getWeekDayProgress(weekNum) > 7;
+  const isPastWeek = unlocked[unlocked.length - 1] >= weekNum && getWeekDayProgress(weekNum) >= 7;
 
   document.getElementById('intro-page').style.display = 'none';
   document.getElementById('week-page').style.display = 'block';
