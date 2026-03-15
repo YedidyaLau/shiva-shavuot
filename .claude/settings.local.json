@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git config --global --add safe.directory '%\\(prefix\\)///wsl.localhost/Ubuntu/home/yedlau/shivashavuot')",
+      "Bash(git -C \"//wsl.localhost/Ubuntu/home/yedlau/shivashavuot\" status)",
+      "Bash(git -C \"//wsl.localhost/Ubuntu/home/yedlau/shivashavuot\" log --oneline -5)",
+      "Bash(git -C \"//wsl.localhost/Ubuntu/home/yedlau/shivashavuot\" add app.js bikkurim-app.js bikkurim-content.js content.js geograf.jpg index.html logo-alon.jpg logo-kolel.jpg yedidya.jpg)",
+      "Bash(git -C:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
+    ]
+  }
+}
