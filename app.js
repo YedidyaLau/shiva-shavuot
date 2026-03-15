@@ -7,7 +7,7 @@
 // ----- הגדרת תאריך -----
 // היום הראשון של ספירת העומר (ליל הסדר – מהשקיעה)
 // פורמט: 'YYYY-MM-DDThh:mm:ss' – השעה קובעת מאיזה רגע השבוע נפתח
-const OMER_START = new Date('2026-04-02T20:00:00');
+const OMER_START = new Date('2026-02-18T20:00:00');
 const OMER_END = new Date('2026-05-22T00:00:00'); // שבועות תשפ"ו – אחרי זה הכל פתוח
 
 // ===== STATE =====
@@ -16,11 +16,9 @@ let hasVisitedOnce = false;
 
 // ===== OMER DATE LOGIC =====
 function getTodayOmerDay() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('day')) return parseInt(params.get('day'));
   const now = new Date();
   const diff = now - OMER_START;
-  if (diff < 0) return 0;
+  if (diff < 0) return 0; // לפני הספירה
   return Math.floor(diff / 86400000) + 1;
 }
 
@@ -225,15 +223,13 @@ if (omerDay < 1) {
     // הצג כפתורי "היום" בכל עמודה
     const btnM = document.getElementById('today-btn-mahalakh');
     const btnB = document.getElementById('today-btn-bikkurim');
-    if (btnM) { btnM.style.display = 'inline-block'; btnM.textContent = `← לתוכן היומי`; }
+    if (btnM) { btnM.style.display = 'inline-block'; btnM.textContent = `← לתכנים של היום (${WEEKS[week-1]?.title || 'שבוע ' + week})`; }
     if (btnB) { btnB.style.display = 'inline-block'; }
   } else {
     ct.innerHTML = `ספירת העומר הסתיימה – כל התכנים פתוחים`;
   }
 
-  const _dayParam = new URLSearchParams(window.location.search).get('day');
-  const _search = _dayParam ? `?day=${_dayParam}` : '';
-  history.pushState({}, '', `${window.location.pathname}${_search}`);
+  history.pushState({}, '', window.location.pathname);
 
   renderProgressBar();
 document.getElementById('progress-bar').style.display = 'block';
@@ -243,7 +239,6 @@ document.getElementById('progress-bar').style.display = 'block';
 
 // ===== RENDER: WEEK PAGE =====
 function isItemVisible(item, dayProgress) {
-  if (dayProgress >= 7 && item.day === 7) return true; // שבוע הסתיים – יום 7 תמיד פתוח
   if (dayProgress < item.day) return false;
   if (dayProgress > item.day) return true;
   // אותו יום – בדוק שעה אם מוגדרת
@@ -260,7 +255,7 @@ function showWeek(weekNum) {
   currentWeek = weekNum;
   const week = WEEKS[weekNum - 1];
   const dayProgress = getWeekDayProgress(weekNum);
-  const isPastWeek = unlocked[unlocked.length - 1] >= weekNum && getWeekDayProgress(weekNum) >= 7;
+  const isPastWeek = unlocked[unlocked.length - 1] >= weekNum && getWeekDayProgress(weekNum) > 7;
 
   document.getElementById('intro-page').style.display = 'none';
   document.getElementById('week-page').style.display = 'block';
@@ -299,9 +294,7 @@ cards.forEach(item => updateSaveButton(item.id));
   } else {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-  const dayParam = new URLSearchParams(window.location.search).get('day');
-  const search = dayParam ? `?day=${dayParam}` : '';
-  history.pushState({ week: weekNum }, '', `${search}#שבוע-${weekNum}`);
+  history.pushState({ week: weekNum }, '', `#שבוע-${weekNum}`);
 
   renderProgressBar();
 document.getElementById('progress-bar').style.display = 'block';
@@ -369,9 +362,26 @@ const videoHtml = item.videoId
     </a>`
   : '';
 
-  const questionHtml = item.question
-    ? `<div class="card-question">${item.question}</div>`
-    : '';
+  const questionHtml = item.silenceTimer
+    ? `<div class="silence-timer" id="timer-${item.id}">
+        <p style="font-size:0.85rem;color:rgba(245,240,232,0.6);margin-bottom:12px;line-height:1.6;">
+          קצטניק תיאר זמן שבו הזמן האנושי פסק לחלוטין.<br>
+          גם אנחנו נעצור – דקה אחת – ונשים לב למה קורה כשהזמן עוצר.
+        </p>
+        <button onclick="startSilence('${item.id}')"
+          style="background:rgba(91,127,166,0.15);border:1px solid rgba(91,127,166,0.4);color:rgba(245,240,232,0.85);padding:10px 24px;border-radius:100px;font-family:Heebo,sans-serif;font-size:0.9rem;cursor:pointer;">
+          ● התחל דקת דומיה
+        </button>
+        <div id="timer-display-${item.id}" style="display:none;margin-top:16px;text-align:center;">
+          <div id="timer-count-${item.id}" style="font-size:2.5rem;font-weight:200;color:rgba(245,240,232,0.5);letter-spacing:0.1em;">1:00</div>
+        </div>
+        <div id="timer-after-${item.id}" style="display:none;margin-top:16px;">
+          <p style="font-size:0.9rem;color:rgba(245,240,232,0.7);font-style:italic;">מה הרגשתם כשהזמן עצר?</p>
+        </div>
+      </div>`
+    : item.question
+      ? `<div class="card-question">${item.question}</div>`
+      : '';
 
   const needsReadMore = !isFeatured && item.excerpt && item.excerpt.length > 120;
   const excerptHtml = needsReadMore
@@ -432,6 +442,44 @@ function togglePasuk(track) {
   btn.textContent = isOpen ? `${icon} יוצאים לדרך` : `${icon} סגור`;
 }
 
+// ===== SILENCE TIMER =====
+function startSilence(cardId) {
+  const btn = document.querySelector(`#timer-${cardId} button`);
+  const display = document.getElementById(`timer-display-${cardId}`);
+  const count = document.getElementById(`timer-count-${cardId}`);
+  const after = document.getElementById(`timer-after-${cardId}`);
+
+  if (btn) btn.style.display = 'none';
+  display.style.display = 'block';
+
+  let seconds = 60;
+  const interval = setInterval(() => {
+    seconds--;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    count.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+    if (seconds <= 0) {
+      clearInterval(interval);
+      display.style.display = 'none';
+      after.style.display = 'block';
+      // צליל עדין
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 528;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 3);
+        osc.start();
+        osc.stop(ctx.currentTime + 3);
+      } catch(e) {}
+    }
+  }, 1000);
+}
+
 // ===== SHARING =====
 function shareCard(cardId) {
   const url = `${window.location.origin}${window.location.pathname}#${cardId}`;
@@ -459,14 +507,8 @@ function handleHash() {
     if (weekMatch) { showWeek(parseInt(weekMatch[1])); return; }
   }
 
-const dayParam = new URLSearchParams(window.location.search).get('day');
-  if (dayParam && omerDay >= 1 && omerDay <= 49) {
-    showWeek(currentWeekNum);
-    return;
-  }
-
-  if (hasVisitedOnce && omerDay >= 1 && omerDay <= 49) {
-    showWeek(currentWeekNum);
+if (hasVisitedOnce && omerDay >= 1 && omerDay <= 49) {
+  showWeek(currentWeekNum);
   } else {
     hasVisitedOnce = true;
     showIntro();
