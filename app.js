@@ -231,7 +231,7 @@ if (omerDay < 1) {
     ct.innerHTML = `ספירת העומר הסתיימה – כל התכנים פתוחים`;
   }
 
-  history.pushState({}, '', window.location.pathname);
+  const _dp = new URLSearchParams(window.location.search).get('day'); history.pushState({}, '', _dp ? '?day=' + _dp : window.location.pathname);
 
   renderProgressBar();
 document.getElementById('progress-bar').style.display = 'block';
