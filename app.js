@@ -231,7 +231,9 @@ if (omerDay < 1) {
     ct.innerHTML = `ספירת העומר הסתיימה – כל התכנים פתוחים`;
   }
 
-  history.pushState({}, '', window.location.pathname);
+  const _dayParam = new URLSearchParams(window.location.search).get('day');
+  const _search = _dayParam ? `?day=${_dayParam}` : '';
+  history.pushState({}, '', `${window.location.pathname}${_search}`);
 
   renderProgressBar();
 document.getElementById('progress-bar').style.display = 'block';
@@ -457,8 +459,14 @@ function handleHash() {
     if (weekMatch) { showWeek(parseInt(weekMatch[1])); return; }
   }
 
-if (hasVisitedOnce && omerDay >= 1 && omerDay <= 49) {
-  showWeek(currentWeekNum);
+const dayParam = new URLSearchParams(window.location.search).get('day');
+  if (dayParam && omerDay >= 1 && omerDay <= 49) {
+    showWeek(currentWeekNum);
+    return;
+  }
+
+  if (hasVisitedOnce && omerDay >= 1 && omerDay <= 49) {
+    showWeek(currentWeekNum);
   } else {
     hasVisitedOnce = true;
     showIntro();
