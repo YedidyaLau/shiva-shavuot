@@ -378,10 +378,10 @@ const videoHtml = item.videoId
           ● התחל דקת דומיה
         </button>
         <div id="timer-display-${item.id}" style="display:none;margin-top:16px;text-align:center;">
-          <div id="timer-count-${item.id}" style="font-size:2.5rem;font-weight:200;color:rgba(245,240,232,0.5);letter-spacing:0.1em;">1:00</div>
+          <div id="timer-count-${item.id}" style="font-size:2.5rem;font-weight:200;color:#f5f0e8;letter-spacing:0.1em;">1:00</div>
         </div>
         <div id="timer-after-${item.id}" style="display:none;margin-top:16px;">
-          <p style="font-size:0.9rem;color:rgba(245,240,232,0.7);font-style:italic;">מה הרגשתם כשהזמן עצר?</p>
+          <div class="card-question">מה הרגשתם כשהזמן עצר?</div>
         </div>
       </div>`
     : item.question
