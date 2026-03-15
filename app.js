@@ -374,7 +374,7 @@ const videoHtml = item.videoId
           גם אנחנו נעצור – דקה אחת – ונשים לב למה קורה כשהזמן עוצר.
         </p>
         <button onclick="startSilence('${item.id}')"
-          style="background:rgba(91,127,166,0.15);border:1px solid rgba(91,127,166,0.4);color:rgba(245,240,232,0.85);padding:10px 24px;border-radius:100px;font-family:Heebo,sans-serif;font-size:0.9rem;cursor:pointer;">
+          style="background:rgba(91,127,166,0.45);border:1px solid rgba(91,127,166,0.8);color:#f5f0e8;padding:10px 24px;border-radius:100px;font-family:Heebo,sans-serif;font-size:0.9rem;cursor:pointer;display:block;margin:0 auto;">
           ● התחל דקת דומיה
         </button>
         <div id="timer-display-${item.id}" style="display:none;margin-top:16px;text-align:center;">
