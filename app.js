@@ -16,6 +16,8 @@ let hasVisitedOnce = false;
 
 // ===== OMER DATE LOGIC =====
 function getTodayOmerDay() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('day')) return parseInt(params.get('day'));
   const now = new Date();
   const diff = now - OMER_START;
   if (diff < 0) return 0; // לפני הספירה
@@ -295,7 +297,9 @@ cards.forEach(item => updateSaveButton(item.id));
   } else {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-  history.pushState({ week: weekNum }, '', `#שבוע-${weekNum}`);
+  const dayParam = new URLSearchParams(window.location.search).get('day');
+  const search = dayParam ? `?day=${dayParam}` : '';
+  history.pushState({ week: weekNum }, '', `${search}#שבוע-${weekNum}`);
 
   renderProgressBar();
 document.getElementById('progress-bar').style.display = 'block';
