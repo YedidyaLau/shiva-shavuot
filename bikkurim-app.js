@@ -69,7 +69,7 @@ function showBikkurimWeek(weekNum) {
   const bikkurimIntroEl = document.getElementById('bikkurim-intro');
   if (bikkurimIntroEl) {
     if (weekData.intro) {
-      bikkurimIntroEl.style.cssText = `background:${weekData.color}08;border-right:3px solid ${weekData.color};padding:16px;font-size:0.9rem;color:rgba(245,240,232,0.8);margin-bottom:24px;margin-top:16px;border-radius:8px;line-height:1.7;`;
+      bikkurimIntroEl.style.cssText = `background:${weekData.color}08;border-right:3px solid ${weekData.color};padding:16px;font-size:0.9rem;color:rgba(245,240,232,0.95);margin-bottom:24px;margin-top:16px;border-radius:8px;line-height:1.7;`;
       bikkurimIntroEl.textContent = weekData.intro;
       bikkurimIntroEl.style.display = 'block';
     } else {
@@ -97,7 +97,9 @@ function showBikkurimWeek(weekNum) {
 
   renderBikkurimText(weekData, currentBikkurimDay);
   renderBikkurimFocus(weekData, isPastWeek ? 8 : dayProgress, currentBikkurimDay);
-  scrollToHighlightedMishna();
+  if (!(weekData.intro && currentBikkurimDay === 1 && !isPastWeek)) {
+    scrollToHighlightedMishna();
+  }
 
   renderProgressBar(); // מ-app.js
   window.scrollTo({ top: 0, behavior: 'smooth' });
