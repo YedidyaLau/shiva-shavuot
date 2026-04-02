@@ -271,6 +271,18 @@ function showWeek(weekNum) {
   document.getElementById('week-tagline').textContent = week.tagline;
   document.getElementById('week-hero').style.background = week.color + '08';
 
+  // intro השבוע
+  const introEl = document.getElementById('week-intro');
+  if (introEl) {
+    if (week.intro) {
+      introEl.style.cssText = `background:${week.color}08;border-right:3px solid ${week.color};padding:16px;font-size:0.9rem;color:rgba(245,240,232,0.8);margin-bottom:24px;`;
+      introEl.textContent = week.intro;
+      introEl.style.display = 'block';
+    } else {
+      introEl.style.display = 'none';
+    }
+  }
+
   // כרטיסי תוכן
   const cards = getWeekContent(weekNum);
 document.getElementById('content-cards').innerHTML = cards.map((item, i) => {
