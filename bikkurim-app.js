@@ -18,6 +18,10 @@ function getBikkurimWeekDayProgress(weekNum) {
 
 function isBikkurimFocusVisible(focus, dayProgress) {
   if (dayProgress >= 7 && focus.day === 7) return true; // שבוע הסתיים – יום סיכום תמיד פתוח
+  // פריט שבת/חג עם שעת פתיחה מוקדמת – יכול להיפתח יום לפני לפי השעה
+  if (focus.hour && dayProgress === focus.day - 1) {
+    return new Date().getHours() >= focus.hour;
+  }
   if (dayProgress < focus.day) return false;
   if (dayProgress > focus.day) return true;
   if (focus.hour) return new Date().getHours() >= focus.hour;

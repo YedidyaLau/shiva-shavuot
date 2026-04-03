@@ -242,6 +242,10 @@ document.getElementById('progress-bar').style.display = 'block';
 // ===== RENDER: WEEK PAGE =====
 function isItemVisible(item, dayProgress) {
   if (dayProgress >= 7 && item.day === 7) return true; // שבוע הסתיים – יום 7 תמיד פתוח
+  // פריט שבת/חג עם שעת פתיחה מוקדמת – יכול להיפתח יום לפני לפי השעה
+  if (item.hour && dayProgress === item.day - 1) {
+    return new Date().getHours() >= item.hour;
+  }
   if (dayProgress < item.day) return false;
   if (dayProgress > item.day) return true;
   // אותו יום – בדוק שעה אם מוגדרת
