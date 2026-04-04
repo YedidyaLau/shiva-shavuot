@@ -514,6 +514,7 @@ function handleHash() {
   if (hash) {
     const weekMatch = hash.match(/שבוע-(\d)/);
     if (weekMatch) { hasVisitedOnce = true; showWeek(parseInt(weekMatch[1])); return; }
+    if (hash.match(/ביכורים-(\d)/)) return; // bikkurim-app.js יטפל
   }
 
   if (hasVisitedOnce && omerDay >= 1 && omerDay <= 49) {
