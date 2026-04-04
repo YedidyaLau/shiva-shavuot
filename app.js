@@ -507,17 +507,17 @@ function showToast() {
 
 // ===== ROUTING =====
 function handleHash() {
-  const hash = window.location.hash;
+  const hash = decodeURIComponent(window.location.hash);
   const omerDay = getTodayOmerDay();
   const currentWeekNum = Math.ceil(omerDay / 7);
 
   if (hash) {
     const weekMatch = hash.match(/שבוע-(\d)/);
-    if (weekMatch) { showWeek(parseInt(weekMatch[1])); return; }
+    if (weekMatch) { hasVisitedOnce = true; showWeek(parseInt(weekMatch[1])); return; }
   }
 
-if (hasVisitedOnce && omerDay >= 1 && omerDay <= 49) {
-  showWeek(currentWeekNum);
+  if (hasVisitedOnce && omerDay >= 1 && omerDay <= 49) {
+    showWeek(currentWeekNum);
   } else {
     hasVisitedOnce = true;
     showIntro();

@@ -212,10 +212,11 @@ const _originalHandleHash = window._originalHandleHash || null;
 
 window.addEventListener('DOMContentLoaded', () => {
   // בדוק אם יש hash של ביכורים
-  const hash = window.location.hash;
+  const hash = decodeURIComponent(window.location.hash);
   if (hash) {
     const bikkurimMatch = hash.match(/ביכורים-(\d)/);
     if (bikkurimMatch) {
+      hasVisitedOnce = true;
       showBikkurimWeek(parseInt(bikkurimMatch[1]));
     }
   }
