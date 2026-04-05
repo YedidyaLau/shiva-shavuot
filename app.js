@@ -395,10 +395,10 @@ const videoHtml = item.videoId
   const needsReadMore = !isFeatured && item.excerpt && item.excerpt.length > 120;
   const excerptHtml = needsReadMore
     ? `<div class="card-excerpt-wrap">
-       <p class="card-excerpt collapsed" id="exc-${item.id}">${formatText(item.excerpt)}</p>       </div>
+       <div class="card-excerpt collapsed" id="exc-${item.id}">${formatText(item.excerpt)}</div>       </div>
        <button class="read-more-btn" id="rmb-${item.id}"
          onclick="toggleReadMore('${item.id}')" style="color:${color}">קרא עוד ↓</button>`
-      : `<p class="card-excerpt" style="margin-bottom:14px">${formatText(item.excerpt)}</p>`;
+      : `<div class="card-excerpt" style="margin-bottom:14px">${formatText(item.excerpt)}</div>`;
   // תגיות קשורות (לשימוש עתידי – מוצגות בשקט כ-data attributes)
   const tagsAttr = item.tags ? `data-tags="${item.tags.join(',')}"` : '';
   const relatedAttr = item.related ? `data-related="${item.related.join(',')}"` : '';
