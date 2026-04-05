@@ -295,6 +295,18 @@
     mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
   }
   .card-excerpt.expanded { max-height: 6000px; mask-image: none; -webkit-mask-image: none; }
+
+  .card-excerpt blockquote {
+    margin: 14px 0;
+    padding: 12px 16px 12px 12px;
+    border-right: 3px solid var(--gold);
+    background: rgba(200, 151, 58, 0.06);
+    border-radius: 0 6px 6px 0;
+    font-size: 0.88rem;
+    line-height: 1.85;
+    color: var(--ink-light);
+  }
+
   .read-more-btn {
     background: none; border: none; padding: 0; font-size: 0.82rem; font-weight: 600;
     cursor: pointer; font-family: 'Heebo', sans-serif; margin-bottom: 14px; display: block; transition: opacity 0.15s;
