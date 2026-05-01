@@ -101,12 +101,15 @@ function showBikkurimWeek(weekNum) {
 
   renderBikkurimText(weekData, currentBikkurimDay);
   renderBikkurimFocus(weekData, isPastWeek ? 8 : dayProgress, currentBikkurimDay);
-  if (!(weekData.intro && currentBikkurimDay === 1 && !isPastWeek)) {
-    scrollToHighlightedMishna();
-  }
-
   renderProgressBar(); // מ-app.js
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // גלול לפריט היומי רק אם זה השבוע הנוכחי (כמו app.js)
+  const todayWeek = Math.ceil(omerDay / 7);
+  if (weekNum === todayWeek && !(weekData.intro && currentBikkurimDay === 1)) {
+    scrollToHighlightedMishna();
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   const dayParam = new URLSearchParams(window.location.search).get('day');
   const search = dayParam ? `?day=${dayParam}` : '';
   history.pushState({ bikkurim: weekNum }, '', `${search}#ביכורים-${weekNum}`);
