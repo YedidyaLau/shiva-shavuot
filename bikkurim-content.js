@@ -83,7 +83,7 @@ const BIKKURIM_WEEK_1 = {
     },
     {
       day: 2,
-      hour: 12,
+      hour: 15,
       sefaria: 'https://www.sefaria.org/Mishnah_Menachot.10.3?lang=he&with=all',
       highlightNums: ['ג'],
       title: 'הפומביות של העומר',
@@ -194,7 +194,7 @@ const BIKKURIM_WEEK_2 = {
     },
     {
       day: 2,
-      hour: null,
+      hour: 15,
       sefaria: 'https://www.sefaria.org/Leviticus.23.10?lang=he&with=all',
       highlightNums: ['ויקרא כג א'],
       title: 'כי תבואו אל הארץ',
@@ -325,7 +325,7 @@ const BIKKURIM_WEEK_3 = {
       question: 'מה ההבדל בין "שלי" לבין "שבאדמתי"? האם יש דברים שאתם "מחזיקים" אבל לא באמת שלכם?',
     },
     {
-      day: 2, hour: null,
+      day: 2, hour: 15,
       sefaria: 'https://www.sefaria.org/Mishnah_Bikkurim.1.3?lang=he&with=all',
       highlightNums: ['ג'],
       title: 'שבעת המינים ועצרת',
@@ -451,7 +451,7 @@ const BIKKURIM_WEEK_4 = {
       question: 'מה הופך דבר ל"קודש"? האם זה החומר, המעשה, או ההגדרה?',
     },
     {
-      day: 2, hour: null,
+      day: 2, hour: 15,
       sefaria: 'https://www.sefaria.org/Mishnah_Bikkurim.2.2?lang=he&with=all',
       highlightNums: ['ב'],
       title: 'מעשר וביכורים – ירושלים',
@@ -582,7 +582,7 @@ const BIKKURIM_WEEK_5 = {
       question: 'מה צריך להיאמר פעמיים בחייכם – פעם אחת לא מספיקה?',
     },
     {
-      day: 2, hour: null,
+      day: 2, hour: 15,
       sefaria: 'https://www.sefaria.org/Mishnah_Bikkurim.3.2?lang=he&with=all',
       highlightNums: ['ב'],
       title: 'מהעיירה לעיר',
@@ -695,7 +695,7 @@ const BIKKURIM_WEEK_6 = {
       question: 'מה בחייכם מוצא מן הכלל ומקבל יחס מיוחד – ולמה?',
     },
     {
-      day: 2, hour: null,
+      day: 2, hour: 15,
       sefaria: 'https://www.sefaria.org/Mishnah_Berakhot.6.2?lang=he&with=all',
       highlightNums: ['ב', 'ג'],
       title: '"שהכל" – הברכה הגדולה',
@@ -811,7 +811,7 @@ const BIKKURIM_WEEK_7 = {
       question: 'מה ההבדל בין מה שעושים לרגע מיוחד לבין מה שנמצא שם תמיד, בשקט?',
     },
     {
-      day: 2, hour: null,
+      day: 2, hour: 15,
       sefaria: 'https://www.sefaria.org/Mishnah_Menachot.11.3?lang=he&with=all',
       highlightNums: ['ג'],
       title: 'חביתי כהן גדול והשבת',
