@@ -128,7 +128,7 @@ const BIKKURIM_WEEK_1 = {
     },
     {
       day: 7,
-      hour: 12,
+      hour: null,
       sefaria: 'https://www.sefaria.org/Mishnah_Menachot.10.1?lang=he&with=all',
       highlightNums: ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט'],
       title: 'סיכום השבוע',
@@ -239,7 +239,7 @@ const BIKKURIM_WEEK_2 = {
     },
     {
       day: 7,
-      hour: 12,
+      hour: null,
       sefaria: 'https://www.sefaria.org/Deuteronomy.26.1?lang=he&with=all',
       highlightNums: ['שמות כג', 'ויקרא כג א', 'ויקרא כג ב', 'ויקרא כג ג', 'דברים כו א', 'דברים כו ב'],
       title: 'סיכום',
@@ -365,7 +365,7 @@ const BIKKURIM_WEEK_3 = {
       question: 'מה הופך מקום ל"ארץ זבת חלב ודבש" בעיניכם? האם זה גיאוגרפיה או תחושה?',
     },
     {
-      day: 7, hour: 12,
+      day: 7, hour: null,
       sefaria: 'https://www.sefaria.org/Mishnah_Bikkurim.1.1?lang=he&with=all',
       highlightNums: ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא'],
       title: 'סיכום',
@@ -491,7 +491,7 @@ const BIKKURIM_WEEK_4 = {
       question: 'יש דברים בחייכם שאתם לא יודעים להגדיר – ואיך אתם חיים עם הספק הזה?',
     },
     {
-      day: 7, hour: 12,
+      day: 7, hour: null,
       sefaria: 'https://www.sefaria.org/Mishnah_Bikkurim.2.1?lang=he&with=all',
       highlightNums: ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא'],
       title: 'סיכום השבוע',
@@ -622,7 +622,7 @@ const BIKKURIM_WEEK_5 = {
       question: 'מתי "קודש" יכול לשמש ככסף? האם זה מוריד מקדושתו?',
     },
     {
-      day: 7, hour: 12,
+      day: 7, hour: null,
       sefaria: 'https://www.sefaria.org/Mishnah_Bikkurim.3.1?lang=he&with=all',
       highlightNums: ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב'],
       title: 'סיכום השבוע',
@@ -735,7 +735,7 @@ const BIKKURIM_WEEK_6 = {
       question: 'האם ה"כמה" תלוי במה שאתם אוכלים, או בכך שאתם אוכלים?',
     },
     {
-      day: 7, hour: 12,
+      day: 7, hour: null,
       sefaria: 'https://www.sefaria.org/Mishnah_Berakhot.6.1?lang=he&with=all',
       highlightNums: ['א','ב','ג','ד','ה','ו','ז','ח'],
       title: 'סיכום השבוע',
@@ -851,7 +851,7 @@ const BIKKURIM_WEEK_7 = {
       question: 'מה שמרתם "לשבת הבאה" – ומה קרה כשסוף סוף הגיע הזמן?',
     },
     {
-      day: 7, hour: 12,
+      day: 7, hour: null,
       sefaria: 'https://www.sefaria.org/Mishnah_Menachot.11.1?lang=he&with=all',
       highlightNums: ['א','ב','ג','ד','ה','ו','ז','ח','ט'],
       title: 'סיכום: סוף המסע',
