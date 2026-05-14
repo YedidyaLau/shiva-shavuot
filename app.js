@@ -533,6 +533,8 @@ function goHome() {
   showIntro();
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', () => { handleHash(); });
+} else {
   handleHash();
-});
+}

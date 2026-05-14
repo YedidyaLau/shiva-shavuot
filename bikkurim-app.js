@@ -213,8 +213,7 @@ function selectBikkurimDay(day) {
 // מוסיף טיפול ב-hash של ביכורים
 const _originalHandleHash = window._originalHandleHash || null;
 
-window.addEventListener('DOMContentLoaded', () => {
-  // בדוק אם יש hash של ביכורים
+function _initBikkurimHash() {
   const hash = decodeURIComponent(window.location.hash);
   if (hash) {
     const bikkurimMatch = hash.match(/ביכורים-(\d)/);
@@ -223,4 +222,10 @@ window.addEventListener('DOMContentLoaded', () => {
       showBikkurimWeek(parseInt(bikkurimMatch[1]));
     }
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', _initBikkurimHash);
+} else {
+  _initBikkurimHash();
+}
